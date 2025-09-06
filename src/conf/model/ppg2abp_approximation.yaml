@@ -1,0 +1,3 @@
+defaults:
+  - base_unet_ds64
+  - _self_

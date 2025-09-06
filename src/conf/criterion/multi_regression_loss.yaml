@@ -1,0 +1,4 @@
+# Multi Regression Loss configuration
+defaults:
+  - base_multi_regression_loss
+  - _self_

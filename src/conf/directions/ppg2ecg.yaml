@@ -1,0 +1,8 @@
+defaults:
+  - base_directions
+  - _self_
+
+active_directions:
+  - _target_: src.core.domain.Direction
+    src: PPG
+    tgt: ECG

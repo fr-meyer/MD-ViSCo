@@ -1,0 +1,5 @@
+defaults:
+  - base_shallow_unet
+  - _self_
+
+input_length: 1024

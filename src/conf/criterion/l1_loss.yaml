@@ -1,0 +1,4 @@
+# L1 Loss configuration
+defaults:
+  - base_l1_loss
+  - _self_

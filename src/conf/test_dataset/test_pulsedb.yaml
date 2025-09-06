@@ -1,0 +1,23 @@
+# PulseDB dataset configuration
+# This file is automatically loaded when dataset=pulsedb is specified
+
+defaults:
+  - /vitals_dataset@vitals_dataset: vitals_pulsedb
+  - base_pulsedb
+  - _self_
+
+# The actual configuration values will be loaded from PulseDBConfig defaults
+# You can override any values here if needed
+
+
+input_size: 1280
+
+dataset_path: ???
+dataset_folder: "PulseDB/mdvisco"
+file_name: "PulseDB_CalFree_Test_Subset.h5"
+# Split ratios moved from common config
+train_ratio: 0.80
+val_ratio: 0.20
+test_ratio: 0.0
+# Splitting strategy flags moved from common config
+use_patient_split: false

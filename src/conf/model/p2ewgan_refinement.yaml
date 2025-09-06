@@ -1,0 +1,6 @@
+defaults:
+  - base_p2ewgan
+  - _self_
+
+generator_init_filters: 640
+discriminator_init_filters: 320

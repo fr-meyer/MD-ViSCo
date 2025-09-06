@@ -1,0 +1,8 @@
+# MDViSCo model configuration
+# This file is automatically loaded when model=mdvisco is specified
+
+defaults:
+  - base_unet_swin_unet
+  - _self_
+
+input_length: 1280

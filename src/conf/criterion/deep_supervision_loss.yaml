@@ -1,0 +1,5 @@
+# Deep Supervision Loss configuration
+defaults:
+  - base_deep_supervision_loss
+  - /criterion@base_criterion: base_mse_loss
+  - _self_

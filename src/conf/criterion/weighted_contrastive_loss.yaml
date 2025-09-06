@@ -1,0 +1,4 @@
+# Weighted Contrastive Loss configuration
+defaults:
+  - base_weighted_contrastive_loss
+  - _self_
