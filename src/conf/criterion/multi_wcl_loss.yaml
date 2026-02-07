@@ -1,0 +1,31 @@
+# Weighted Contrastive Loss configuration
+defaults:
+  - base_multi_wcl_loss
+  - _self_
+
+loss_terms:
+  - _target_: src.criterions.weighted_contrastive_loss.WeightedContrastiveLoss
+    name: "ecg_sbp"
+    embedding_key: "ecg_embeddings"
+    weight_key: "y_sbp_raw"
+    scale_factor: 1e-3
+  - _target_: src.criterions.weighted_contrastive_loss.WeightedContrastiveLoss
+    name: "ppg_sbp"
+    embedding_key: "ppg_embeddings"
+    weight_key: "y_sbp_raw"
+    scale_factor: 1e-3
+  - _target_: src.criterions.weighted_contrastive_loss.WeightedContrastiveLoss
+    name: "ecg_dbp"
+    embedding_key: "ecg_embeddings"
+    weight_key: "y_dbp_raw"
+    scale_factor: 1e-3
+  - _target_: src.criterions.weighted_contrastive_loss.WeightedContrastiveLoss
+    name: "ppg_dbp"
+    embedding_key: "ppg_embeddings"
+    weight_key: "y_dbp_raw"
+    scale_factor: 1e-3
+  - _target_: src.criterions.weighted_contrastive_loss.WeightedContrastiveLoss
+    name: "text_gender_wcl"
+    embedding_key: "text_embeddings"
+    weight_key: "gender"
+    scale_factor: 1e-2

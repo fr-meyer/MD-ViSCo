@@ -1,0 +1,6 @@
+defaults:
+  - base_wgan_gp_loss
+  - /criterion@adv_config: base_wgan_adversarial_loss
+  - /criterion@mse_config: base_mse_loss
+  - /criterion@gp_config: base_wgan_gradient_penalty
+  - _self_

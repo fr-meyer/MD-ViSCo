@@ -1,0 +1,10 @@
+# src/conf/wandb_wrapper/wandb.yaml
+
+defaults:
+  - base_wandb_wrapper
+  - _self_
+
+entity: ???
+project_name: ???
+run_name: null
+wandb_enabled: true

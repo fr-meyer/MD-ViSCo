@@ -1,0 +1,20 @@
+# UCI dataset configuration
+
+defaults:
+  - /vitals_dataset@vitals_dataset: vitals_uci
+  - base_uci
+  - _self_
+
+# The actual configuration values will be loaded from UCIConfig defaults
+# You can override any values here if needed
+input_size: 1024
+
+dataset_path: ???
+dataset_folder: "UCI_Dataset_Preprocessed/mdvisco"
+file_name: 'UCI_train.h5'
+# Split ratios moved from common config
+train_ratio: 0.80
+val_ratio: 0.20
+test_ratio: 0.0
+# Splitting strategy flags moved from common config
+use_patient_split: false

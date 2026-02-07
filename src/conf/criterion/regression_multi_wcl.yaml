@@ -1,0 +1,5 @@
+defaults:
+  - base_regression_multi_wcl_loss
+  - /criterion@wcl_loss_terms: multi_wcl_loss
+  - /criterion@regression_loss_term: l1_loss
+  - _self_

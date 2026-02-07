@@ -1,0 +1,11 @@
+# NABNet model configuration
+# This file is automatically loaded when model=nabnet is specified
+
+defaults:
+  - base_nabnet
+  - _self_
+
+# Model architecture parameters for NABNet encoder-decoder model
+# These parameters control the architecture and behavior of the NABNet model
+
+input_length: 1024

@@ -1,0 +1,8 @@
+defaults:
+  - base_vitals_dataset
+  - _self_
+
+channels:
+  ECG: 0
+  PPG: 1
+  ABP: 2

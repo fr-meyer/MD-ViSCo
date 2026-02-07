@@ -1,0 +1,13 @@
+# Approximation GAN Trainer Configuration
+defaults:
+  - base_gan_refinement
+  - /model@model: p2ewgan_refinement
+  - /criterion@criterion: wgan_gp_loss
+  - /checkpoint_manager@checkpoint_manager: checkpoint_manager
+  - /progress_bar@progress_bar: progress_bar
+  - /early_stopping@early_stopping: early_stopping
+  - /directions@directions: ppg2abp
+
+
+model:
+  dictionary_key: y_pred_bp

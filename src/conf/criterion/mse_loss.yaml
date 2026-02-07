@@ -1,0 +1,4 @@
+# MSE Loss configuration
+defaults:
+  - base_mse_loss
+  - _self_

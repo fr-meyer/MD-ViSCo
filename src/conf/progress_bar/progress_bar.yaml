@@ -1,0 +1,6 @@
+# src/conf/progress_bar/progress_bar.yaml
+
+defaults:
+  - base_progress_bar
+  - /wandb_wrapper@wandb_wrapper: wandb
+  - _self_

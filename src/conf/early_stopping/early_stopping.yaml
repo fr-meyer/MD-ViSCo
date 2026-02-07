@@ -1,0 +1,3 @@
+defaults:
+  - base_early_stopping
+  - _self_

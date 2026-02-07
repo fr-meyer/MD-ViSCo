@@ -1,0 +1,39 @@
+# Base configuration for MD-ViSCo training
+# This file serves as the main entry point for Hydra configuration
+
+defaults:
+  - base_config
+  - train_dataset: train_uci  # ← Add dataset defaults
+  - test_dataset: test_uci  # ← Add dataset defaults
+  - trainer: approximation_trainer
+  - _self_
+
+# Common settings removed - all configuration moved to domain-specific configs
+
+train_dataset:
+  dataset_path: ???
+  
+test_dataset:
+  dataset_path: ???
+
+trainer:
+  # Logging configuration (moved from common config)
+  logging_level: "INFO"
+  log_file_path: "training.log"
+  max_source_channels: 1
+  resume_training: false
+  load_model_weights: false
+  direction_mode: ??? # single or multi
+  overwrite_checkpoint: ???
+  strict_loading: true
+  use_patient_information: ???
+  
+  input_preprocessing: ???
+  
+  checkpoint_manager:
+    base_dir: ???
+  
+  progress_bar:
+    wandb_wrapper:  
+      entity: ???
+      project_name: ???

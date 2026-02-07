@@ -1,0 +1,3 @@
+defaults:
+  - base_checkpoint_manager
+  - _self_

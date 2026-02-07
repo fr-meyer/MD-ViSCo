@@ -1,0 +1,23 @@
+defaults:
+  - base_directions
+  - _self_
+
+active_directions:
+  - _target_: src.core.domain.Direction
+    src: PPG
+    tgt: ECG
+  - _target_: src.core.domain.Direction
+    src: PPG
+    tgt: ABP
+  - _target_: src.core.domain.Direction
+    src: ECG
+    tgt: PPG
+  - _target_: src.core.domain.Direction
+    src: ECG
+    tgt: ABP
+  - _target_: src.core.domain.Direction
+    src: ABP
+    tgt: PPG
+  - _target_: src.core.domain.Direction
+    src: ABP
+    tgt: ECG
