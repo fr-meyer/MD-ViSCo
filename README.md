@@ -5,7 +5,9 @@
 [![Hydra Config](https://img.shields.io/badge/config-Hydra-1f4b99)](https://github.com/facebookresearch/hydra)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-MD-ViSCo is a unified deep learning framework for converting vital sign waveforms (ECG, PPG, ABP) using a single model. It combines a 1D U-Net with a Swin Transformer using AdaIN for waveform style adaptation, and integrates patient demographic information via text embeddings for enhanced predictions. 
+MD-ViSCo is a unified deep learning framework for converting vital sign waveforms (ECG, PPG, ABP) using a single model. It combines a 1D U-Net with a Swin Transformer using AdaIN for waveform style adaptation, and integrates patient demographic information via text embeddings for enhanced predictions.
+
+**Published in IEEE Journal of Biomedical and Health Informatics (2026).**
 
 ## Table of Contents
 
@@ -329,14 +331,17 @@ pyright src/
 If you use MD-ViSCo in your research, please cite:
 
 ```bibtex
-@misc{meyer2025mdviscounifiedmodelmultidirectional,
-    title={MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion},
-    author={Franck Meyer and Kyunghoon Hur and Edward Choi},
-    year={2025},
-    eprint={2506.08357},
-    archivePrefix={arXiv},
-    primaryClass={cs.SD},
-    url={https://arxiv.org/abs/2506.08357},
+@ARTICLE{11366001,
+  author={Meyer, Franck and Hur, Kyunghoon and Choi, Edward},
+  journal={IEEE Journal of Biomedical and Health Informatics},
+  title={MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion},
+  year={2026},
+  volume={},
+  number={},
+  pages={1-15},
+  doi={10.1109/JBHI.2025.3639315},
+  ISSN={2168-2208},
+  url={https://ieeexplore.ieee.org/document/11366001}
 }
 ```
 

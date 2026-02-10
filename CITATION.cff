@@ -9,7 +9,7 @@ authors:
   - family-names: Choi
     given-names: Edward
 title: "MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion"
-version: 3.0.0
+version: 4.0.0
 # Before publishing a release: set date-released to the actual release date (YYYY-MM-DD).
 date-released: 2026-02-10
 url: "https://github.com/fr-meyer/MD-ViSCo"
@@ -25,7 +25,7 @@ keywords:
   - atrial fibrillation classification
 license: MIT
 preferred-citation:
-  type: article
+  type: article-journal
   authors:
     - family-names: Meyer
       given-names: Franck
@@ -34,5 +34,12 @@ preferred-citation:
     - family-names: Choi
       given-names: Edward
   title: "MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion"
-  year: 2025
-  url: "https://arxiv.org/abs/2506.08357"
+  journal:
+    title: "IEEE Journal of Biomedical and Health Informatics"
+    issn: 2168-2208
+    volume: ""
+    issue: ""
+    pages: 1-15
+  year: 2026
+  doi: "10.1109/JBHI.2025.3639315"
+  url: "https://ieeexplore.ieee.org/document/11366001"

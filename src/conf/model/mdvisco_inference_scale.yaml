@@ -3,7 +3,7 @@
 # ============================================================================
 # Two-stage scaling for BP waveform reconstruction (inference): Stage1 approximation → Stage2 refinement; unscaling via SBP/DBP.
 #
-# Paper: MD-ViSCo (arXiv:2506.08357)
+# Paper: MD-ViSCo (IEEE J. Biomed. Health Inform. (2026, DOI: 10.1109/JBHI.2025.3639315))
 # Datasets: UCI (1024) | PulseDB (1280)
 # Validation: Needs verification
 #
