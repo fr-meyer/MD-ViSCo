@@ -1,0 +1,43 @@
+# ============================================================================
+# Demographics Text Encoder Configuration
+# ============================================================================
+#
+# Purpose:
+#   Generates batch_dict["text"] with input_ids and attention_mask for patient
+#   information embedding using DistilBERT. Encoder is configured automatically
+#   from input_preprocessing.include when demographics fields are present.
+#   Handles patient information encoding (age, gender, height, weight, BMI).
+#
+# Inherits:
+#   - base_demographics_text_encoder: Base demographics text encoder configuration
+#     (from src/preprocessors/demographics_text_encoder.py)
+#
+# Notes:
+#   - When demographics fields (age_raw, gender_raw, height_raw, weight_raw,
+#     bmi_raw) are present in input_preprocessing.include, trainer._build_dataloaders()
+#     validates that demographics_text_encoder is configured, raising ValueError
+#     if missing
+#   - Used by refinement trainers that require demographic information
+#
+# ============================================================================
+
+defaults:
+  - base_demographics_text_encoder
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /input_preprocessor@demographics_text_encoder: demographics_text_encoder
+#
+# 2. Override encoder parameters via CLI:
+#    python src/train.py trainer=refinement_trainer_mdvisco \
+#      trainer.demographics_text_encoder.tokenizer_name=bert-base-uncased
+#    python src/train.py trainer=refinement_trainer_mdvisco \
+#      trainer.demographics_text_encoder.max_length=256
+#
+# 3. Reference:
+#    Parameters and output schema: see src.preprocessors.demographics_text_encoder.DemographicsTextEncoder
+# ============================================================================
+

@@ -1,0 +1,38 @@
+# ============================================================================
+# StepLR Scheduler Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for StepLR (Step Learning Rate) scheduler.
+#   Composes base_step_lr from the scheduler ConfigStore to provide step-based
+#   learning rate decay parameters for model training.
+#
+# Inherits:
+#   - base_step_lr: Base StepLR scheduler configuration from ConfigStore
+#
+# Notes:
+#   - _partial_ is inherited from BaseSchedulerConfig, so no need to specify it here
+#   - Defaults ordering: base config first, then _self_ for local overrides
+#   - Reduces learning rate by gamma every step_size epochs
+#
+# ============================================================================
+
+defaults:
+  - base_step_lr
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - scheduler: step_lr
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      scheduler=step_lr
+#
+# 3. Override scheduler parameters:
+#    python src/train.py scheduler=step_lr \
+#      scheduler.step_size=10 \
+#      scheduler.gamma=0.1
+# ============================================================================

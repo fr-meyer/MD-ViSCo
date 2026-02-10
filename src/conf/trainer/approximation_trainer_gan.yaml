@@ -1,0 +1,59 @@
+# ============================================================================
+# GAN Approximation Trainer Configuration (P2E-WGAN)
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for P2E-WGAN approximation (first-stage) training.
+#   Trains P2E-WGAN generator to generate initial waveform approximations
+#   using Wasserstein GAN with gradient penalty loss.
+#
+# Inherits:
+#   - base_approximation_trainer: Base approximation trainer configuration
+#   - base_gan_trainer: Base GAN trainer configuration
+#   - model: p2ewgan_approximation (P2E-WGAN approximation model)
+#   - criterion: wgan_gp_loss (Wasserstein GAN with gradient penalty)
+#
+# Notes:
+#   - n_critic: 3 (number of discriminator updates per generator update)
+#   - Batch size: 192 (larger batch size for GAN training stability)
+#   - Number of epochs: 25 (typically fewer epochs needed for GANs)
+#   - Early stopping disabled (early_stopping: null)
+#   - Scheduler disabled (scheduler: null)
+#
+# ============================================================================
+
+defaults:
+  - base_approximation_trainer
+  - base_gan_trainer
+  - /model@model: p2ewgan_approximation
+  - /criterion@criterion: wgan_gp_loss
+  - _self_
+
+n_critic: 3
+batch_size: 192
+num_epochs: 25
+
+early_stopping: null
+scheduler: null
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=approximation_trainer_gan \
+#      train_dataset=train_uci
+#
+# 2. Override direction:
+#    python -m src.train trainer=approximation_trainer_gan \
+#      directions=ecg2abp
+#
+# 3. Override GAN-specific parameters:
+#    python -m src.train trainer=approximation_trainer_gan \
+#      n_critic=5 \
+#      batch_size=128 \
+#      num_epochs=50
+#
+# 4. Override model parameters:
+#    python -m src.train trainer=approximation_trainer_gan \
+#      model.generator_init_filters=256 \
+#      model.discriminator_init_filters=128
+# ============================================================================

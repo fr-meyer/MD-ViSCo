@@ -1,0 +1,42 @@
+# ============================================================================
+# UCI Preprocessing Configuration
+# ============================================================================
+#
+# Purpose:
+#   Convenient wrapper configuration for UCI dataset preprocessing. Composes
+#   base_uci_preprocessing and provides common overrides for preprocessing
+#   UCI dataset files into HDF5 format suitable for training.
+#
+# Inherits:
+#   - base_uci_preprocessing: Base UCI preprocessing configuration from ConfigStore
+#
+# Notes:
+#   - Input and output file paths are required and must be provided via CLI
+#   - This wrapper simplifies common preprocessing workflows for UCI datasets
+#
+# ============================================================================
+
+defaults:
+  - base_uci_preprocessing
+  - _self_
+
+# Common field overrides for runtime configuration
+input_file: ???  # Path to input .h5 file (required)
+output_file: ???  # Path to output directory or file (required)
+
+# Usage Examples
+# ============================================================================
+# 1. Basic preprocessing:
+#    python -m src.script.preprocess.preprocess \
+#      preprocessor=uci_preprocessing \
+#      preprocessor.input_file=/path/to/input.h5 \
+#      preprocessor.output_file=/path/to/output.h5
+#
+# 2. Override additional preprocessing parameters:
+#    python -m src.script.preprocess.preprocess \
+#      preprocessor=uci_preprocessing \
+#      preprocessor.input_file=/path/to/input.h5 \
+#      preprocessor.output_file=/path/to/output.h5 \
+#      preprocessor.save_files=true
+# ============================================================================
+

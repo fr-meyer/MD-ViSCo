@@ -1,0 +1,43 @@
+# ============================================================================
+# MimicPERFormLarge Preprocessing Configuration
+# ============================================================================
+#
+# Purpose:
+#   Convenient wrapper configuration for MimicPERFormLarge dataset preprocessing.
+#   Composes base_mimicperformlarge_preprocessing and provides common overrides
+#   for preprocessing MimicPERFormLarge dataset files into HDF5 format suitable
+#   for training.
+#
+# Inherits:
+#   - base_mimicperformlarge_preprocessing: Base MimicPERFormLarge preprocessing configuration from ConfigStore
+#
+# Notes:
+#   - Input and output file paths are required and must be provided via CLI
+#   - This wrapper simplifies common preprocessing workflows for MimicPERFormLarge datasets
+#
+# ============================================================================
+
+defaults:
+  - base_mimicperformlarge_preprocessing
+  - _self_
+
+# Common field overrides for runtime configuration
+input_file: ???  # Path to input .mat file (required)
+output_file: ???  # Path to output directory or file (required)
+
+# Usage Examples
+# ============================================================================
+# 1. Basic preprocessing:
+#    python -m src.script.preprocess.preprocess \
+#      preprocessor=mimicperformlarge_preprocessing \
+#      preprocessor.input_file=/path/to/input.mat \
+#      preprocessor.output_file=/path/to/output.h5
+#
+# 2. Override additional preprocessing parameters:
+#    python -m src.script.preprocess.preprocess \
+#      preprocessor=mimicperformlarge_preprocessing \
+#      preprocessor.input_file=/path/to/input.mat \
+#      preprocessor.output_file=/path/to/output.h5 \
+#      preprocessor.save_files=true
+# ============================================================================
+

@@ -1,0 +1,27 @@
+# ============================================================================
+# P2E-WGAN Model – Unified Configuration
+# ============================================================================
+# Paper: P2E-WGAN (Vo et al. 2021) https://dl.acm.org/doi/10.1145/3412841.3441979 Sec. 2.5, Figs 2-3
+# Validation: Validated 2026-01-29
+# Datasets: UCI (1024) | PulseDB (1280)
+#
+# Params set here:
+#   generator_init_filters=128, discriminator_init_filters=128 → paper Sec. 2.5
+#   input_length → dataset (Hydra)
+#
+# Notes:
+#   - Capacity-scaled experiments (e.g. 288/144 or 640/320) via CLI overrides.
+#   - Checkpoints from approximation or refinement training are compatible; use same config name.
+#
+# Usage:
+#   torchrun --standalone --nproc_per_node=1 --module src.train -m model=p2ewgan trainer=approximation_trainer_gan train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_p2ewgan
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+# Model architecture parameters (paper Sec. 2.5; GitHub models.py)
+generator_init_filters: 128   # Paper/original GeneratorUNet first layer
+discriminator_init_filters: 128  # Paper/original Discriminator first layer

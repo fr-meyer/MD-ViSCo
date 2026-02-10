@@ -1,0 +1,41 @@
+# ============================================================================
+# Waveform Processor Test Configuration
+# ============================================================================
+#
+# Purpose:
+#   WaveformOutputProcessor configuration for waveform regression tasks (evaluation).
+#   Enables compute_metrics for basic waveform evaluation without BP extractor.
+#   Processes continuous waveform predictions (PPG→ABP, ECG→ABP, etc.) with
+#   full metric computation enabled.
+#
+# Inherits:
+#   - base_waveform_processor: Base waveform processor configuration
+#     (WaveformProcessorConfig)
+#
+# Notes:
+#   - Unified processor interface (process()) handles all stages:
+#     * stage="train": minimal parsing, no trimming unless trainer requests full metrics
+#     * stage="val"/"test": full trimming, scalar extraction, optional metrics
+#   - compute_metrics: true for basic waveform evaluation without BP extractor
+#   - Used for evaluation runs where waveform metrics are needed
+#
+# ============================================================================
+
+defaults:
+  - base_waveform_processor
+
+compute_metrics: true
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /processor@processor: waveform_processor_test
+#
+# 2. Command line override:
+#    python src/train.py processor=waveform_processor_test
+#
+# 3. Override metrics computation:
+#    python src/train.py processor=waveform_processor_test \
+#      processor.compute_metrics=false
+# ============================================================================

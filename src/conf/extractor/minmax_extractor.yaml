@@ -1,0 +1,38 @@
+# ============================================================================
+# MinMax Extractor Configuration
+# ============================================================================
+#
+# Purpose:
+#   Extracts minimum and maximum values from any waveform with customizable keys.
+#   Generic waveform analysis when no modality-specific extractor exists; custom
+#   feature naming; amplitude range for signal quality.
+#
+# Inherits:
+#   - base_minmax_extractor: Base minmax extractor configuration
+#     (from src/processors/extractors.py)
+#
+# Notes:
+#   - Generic extractor for any waveform type
+#   - BPExtractor extends this with min_name=dbp, max_name=sbp for ABP
+#   - Use cases: generic waveform analysis when no modality-specific extractor
+#     exists; custom feature naming; amplitude range for signal quality
+#
+# ============================================================================
+
+defaults:
+  - base_minmax_extractor
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in processor configs via Hydra defaults:
+#    defaults:
+#      - /extractor@extractor: minmax_extractor
+#
+# 2. Override key names via CLI:
+#    python src/train.py processor.extractor.min_name=custom_min
+#    python src/train.py processor.extractor.max_name=custom_max
+#
+# 3. Reference:
+#    Parameters and output schema: see src.processors.extractors.MinMaxExtractor
+# ============================================================================

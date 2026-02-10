@@ -1,0 +1,63 @@
+# ============================================================================
+# AF Classification Evaluator Configuration
+# ============================================================================
+#
+# Purpose:
+#   Evaluator configuration for atrial fibrillation (AF) classification tasks.
+#   Performs inference on classification models and computes classification
+#   metrics (accuracy, precision, recall, F1-score, etc.).
+#
+# Inherits:
+#   - base_af_classification: Base AF classification evaluator configuration
+#   - checkpoint_manager: Checkpoint loading/saving configuration
+#   - checkpoint_io: Checkpoint I/O configuration
+#   - progress_bar: Progress bar and logging configuration
+#   - directions: ppg2ecg (PPG to ECG direction)
+#   - processor: classification_processor (classification output processing)
+#   - model: af_classifier_uci (AF classifier model)
+#
+# Notes:
+#   - Required: input_preprocessing is MISSING in base config and must be
+#     defined here
+#   - Uses classification_processor for logits/probabilities/class predictions
+#   - Supports binary and multi-class AF classification
+#
+# ============================================================================
+
+defaults:
+  - base_af_classification
+  - /checkpoint_manager@checkpoint_managers.save: checkpoint_manager
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - /progress_bar@progress_bar: progress_bar
+  - /directions@directions: ppg2ecg
+  - /processor@processor: classification_processor
+  - /model@model: af_classifier_uci
+  - _self_
+
+# Required: input_preprocessing is MISSING in base config
+input_preprocessing:
+  _convert_: all
+  source:
+    vital: ppg
+    norm: minmax_zc
+  target:
+    vital: ecg
+    norm: minmax_zc
+  class_labels: af_labels
+
+# Usage Examples
+# ============================================================================
+# 1. Command line usage:
+#    python -m src.test evaluator=af_classification_evaluator \
+#      test_dataset=test_mimic_perform_af_1024 \
+#      test_dataset.dataset_path=/path/to/dataset
+#
+# 2. Override model or processor:
+#    python -m src.test evaluator=af_classification_evaluator \
+#      evaluator.model=af_classifier_cascade \
+#      evaluator.processor.threshold=0.3
+#
+# 3. Override checkpoint path:
+#    python -m src.test evaluator=af_classification_evaluator \
+#      evaluator.checkpoint_managers.save.base_dir=/path/to/checkpoints
+# ============================================================================

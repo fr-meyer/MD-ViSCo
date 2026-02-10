@@ -1,0 +1,36 @@
+# ============================================================================
+# SGD Optimizer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for SGD optimizer settings. Composes base_sgd
+#   from the Hydra ConfigStore to provide SGD optimizer parameters for model
+#   training.
+#
+# Inherits:
+#   - base_sgd: Base SGD optimizer configuration from ConfigStore
+#
+# Notes:
+#   - Standard stochastic gradient descent optimizer with optional momentum
+#   - Parameters (learning rate, momentum, weight decay) are defined in base_sgd
+#
+# ============================================================================
+
+defaults:
+  - base_sgd
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /optimizer@optimizer: sgd
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      optimizer=sgd \
+#      optimizer.lr=0.01
+#
+# 3. Override specific parameters:
+#    python src/train.py optimizer=sgd optimizer.lr=0.01 optimizer.momentum=0.9
+# ============================================================================

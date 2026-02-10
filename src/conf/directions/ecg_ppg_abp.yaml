@@ -1,23 +1,43 @@
+# ============================================================================
+# ECG-PPG-ABP Multi-Direction Configuration
+# ============================================================================
+#
+# Purpose:
+#   Comprehensive multi-direction configuration for ECG, PPG, and ABP waveform
+#   transformations. Defines all possible direction mappings between these
+#   three signal types, enabling models to learn transformations across all
+#   combinations.
+#
+# Inherits:
+#   - base_directions: Base direction configuration from ConfigStore
+#
+# Notes:
+#   - Multi-direction configuration: All combinations of PPG, ECG, and ABP
+#   - Includes: PPG→ECG, PPG→ABP, ECG→PPG, ECG→ABP, ABP→PPG, ABP→ECG
+#   - Used for comprehensive multi-direction training
+#
+# ============================================================================
+
 defaults:
   - base_directions
   - _self_
 
 active_directions:
   - _target_: src.core.domain.Direction
-    src: PPG
-    tgt: ECG
+    source: [PPG]
+    target: ECG
   - _target_: src.core.domain.Direction
-    src: PPG
-    tgt: ABP
+    source: [PPG]
+    target: ABP
   - _target_: src.core.domain.Direction
-    src: ECG
-    tgt: PPG
+    source: [ECG]
+    target: PPG
   - _target_: src.core.domain.Direction
-    src: ECG
-    tgt: ABP
+    source: [ECG]
+    target: ABP
   - _target_: src.core.domain.Direction
-    src: ABP
-    tgt: PPG
+    source: [ABP]
+    target: PPG
   - _target_: src.core.domain.Direction
-    src: ABP
-    tgt: ECG
+    source: [ABP]
+    target: ECG

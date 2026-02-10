@@ -1,0 +1,28 @@
+# ============================================================================
+# PPG to BP Direction Configuration
+# ============================================================================
+#
+# Purpose:
+#   Single-source direction configuration for PPG to BP (Blood Pressure) scalar
+#   estimation. Enables BPModel to use only PPG signal for blood pressure
+#   estimation (SBP, DBP, MAP) in scalar regression tasks.
+#
+# Inherits:
+#   - base_directions: Base direction configuration from ConfigStore
+#
+# Notes:
+#   - Single-source direction: PPG → BP (scalar)
+#   - Used for scalar blood pressure estimation tasks
+#   - BPModel creates a single encoder for PPG signal
+#
+# ============================================================================
+
+defaults:
+  - base_directions
+  - _self_
+
+active_directions:
+  - _target_: src.core.domain.Direction
+    source: [PPG]
+    target: BP
+

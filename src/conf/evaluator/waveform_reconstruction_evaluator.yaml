@@ -1,0 +1,95 @@
+# ============================================================================
+# Waveform Reconstruction Evaluator Configuration
+# ============================================================================
+#
+# Purpose:
+#   Evaluator configuration for waveform reconstruction tasks. Performs inference
+#   on waveform generation models and computes reconstruction metrics (MSE, MAE,
+#   correlation, etc.). Default runs without loading checkpoints unless explicitly
+#   configured.
+#
+# Inherits:
+#   - base_waveform_reconstruction: Base waveform reconstruction evaluator configuration
+#   - checkpoint_manager: Checkpoint saving configuration
+#   - checkpoint_io: Checkpoint I/O configuration
+#   - progress_bar: Progress bar and logging configuration
+#   - directions: ppg2abp (PPG to ABP direction)
+#   - model: mdvisco_approximation_uci (MD-ViSCo approximation model)
+#   - processor: waveform_processor_test (waveform output processing)
+#
+# Notes:
+#   - Default: load_model_weights=false (runs without checkpoint loading)
+#   - Set load_model_weights=true and provide checkpoint_managers.model.base_dir
+#     (or concrete checkpoint path) to load weights
+#   - Processor ensures evaluator-local post-processing matches training configuration
+#   - fail_on_missing_metrics: true (strict metric validation)
+#
+# ============================================================================
+
+# @package evaluator
+defaults:
+  - base_waveform_reconstruction
+  - /checkpoint_manager@checkpoint_managers.save: checkpoint_manager
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - /progress_bar@progress_bar: progress_bar
+  - /directions@directions: ppg2abp
+  - /model@model: mdvisco_approximation_uci
+  # Processor ensures evaluator-local post-processing matches training configuration
+  - /processor@processor: waveform_processor_test
+  - _self_
+
+load_model_weights: false
+fail_on_missing_metrics: true
+
+input_preprocessing:
+  source:
+    - vital: "ppg"
+      norm: "minmax_zc"
+    - vital: "ecg"
+      norm: "minmax_zc"
+    - vital: "abp"
+      norm: "minmax_zc"  # or "global_minmax" depending on your needs
+  target:
+    - vital: "ppg"
+      norm: "minmax_zc"
+    - vital: "ecg"
+      norm: "minmax_zc"
+    - vital: "abp"
+      norm: "minmax_zc"  # or "global_minmax" depending on your needs
+
+checkpoint_managers:
+  model:
+    _target_: src.utils.checkpoint_manager.CheckpointManager
+    base_dir: "./weights/"
+
+checkpoint_mapping:
+  model:
+    manager: model
+    checkpoint_key: model_state_dict
+    target_key: model
+
+# P2E-WGAN generator-only inference: use evaluator=waveform_reconstruction_p2ewgan_evaluator, or override:
+#   model@evaluator.model=p2ewgan_generator_inference \
+#   evaluator.checkpoint_mapping.model.checkpoint_key=generator_state_dict
+
+# Usage Examples
+# ============================================================================
+# 1. Command line usage (without checkpoint loading):
+#    python -m src.test evaluator=waveform_reconstruction_evaluator \
+#      test_dataset=test_uci \
+#      test_dataset.dataset_path=/path/to/dataset
+#
+# 2. Override checkpoint path:
+#    python -m src.test evaluator=waveform_reconstruction_evaluator \
+#      evaluator.load_model_weights=true \
+#      evaluator.checkpoint_managers.model.base_dir=/path/to/checkpoints
+#
+# 3. Override model or processor:
+#    python -m src.test evaluator=waveform_reconstruction_evaluator \
+#      evaluator.model=nabnet_approximation \
+#      evaluator.processor=waveform_processor_ref_test
+#
+# 4. Override direction:
+#    python -m src.test evaluator=waveform_reconstruction_evaluator \
+#      evaluator.directions=ecg2abp
+# ============================================================================

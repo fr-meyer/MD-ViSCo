@@ -1,0 +1,35 @@
+# ============================================================================
+# AF Classifier Cascade - Unified Configuration
+# ============================================================================
+# Two-stage AF classification: Stage1 CNNEncoder (features) → Stage2 AFClassifier (MLP).
+#
+# Validation: Needs verification
+# Datasets: UCI (1024) | PulseDB (1280)
+#
+# Params set here (source):
+#   stage1_model: cnn_encoder, stage2_model: af_classifier → composition
+#   stage2_model.input_length: ${encoder_output_size:...} → encoder output (Hydra)
+#   stage2_model.hidden_sizes: [256, 128] → overrides
+#
+# Notes:
+#   - Stage2 input_length matches CNNEncoder output via encoder_output_size resolver.
+#
+# Usage:
+#   torchrun --standalone --nproc_per_node=1 --module src.train -m model=af_classifier_cascade \
+#     trainer=classification_trainer train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_two_stage_cascade_model
+  - /model@stage1_model: cnn_encoder
+  - /model@stage2_model: af_classifier
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+# Model class and identification (other params from TwoStageCascadeModelConfig dataclass defaults)
+model_name: AFClassifierCascade
+auto_eval_in_forward: true
+
+stage2_model:
+  input_length: ${encoder_output_size:${oc.select:train_dataset.input_size,${test_dataset.input_size}}}
+  hidden_sizes: [256, 128]

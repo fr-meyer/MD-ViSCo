@@ -1,0 +1,35 @@
+# ============================================================================
+# P2E-WGAN Generator Inference Configuration
+# ============================================================================
+# Generator-only config for P2E-WGAN inference. Use when loading pre-trained
+# generator checkpoints from full GAN training (approximation or refinement).
+#
+# Alignment:
+# init_filters=128 matches paper/original and p2ewgan.yaml (paper defaults).
+# For capacity-scaled checkpoints, override model.init_filters to match training.
+#
+# Paper: P2E-WGAN (Vo et al. 2021) https://dl.acm.org/doi/10.1145/3412841.3441979
+# Validation: Validated 2026-01-29
+# Datasets: UCI (1024) | PulseDB (1280)
+#
+# Params set here:
+#   init_filters=128 → paper / unified p2ewgan.yaml baseline
+#
+# Notes:
+#   - Compatible with checkpoints from p2ewgan training (approximation or refinement).
+#   - Loads only generator weights via checkpoint_key=generator_state_dict.
+#   - For non-default capacity, set model.init_filters to match training config.
+#
+# Usage:
+#   python -m src.test test_dataset=test_uci evaluator=waveform_reconstruction_evaluator \
+#     model@evaluator.model=p2ewgan_generator_inference \
+#     evaluator.checkpoint_mapping.model.checkpoint_key=generator_state_dict
+# ============================================================================
+
+defaults:
+  - base_generator_p2ewgan
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+# Model architecture parameters (paper 128; override for capacity-scaled checkpoints)
+init_filters: 128

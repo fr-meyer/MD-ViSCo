@@ -1,0 +1,28 @@
+# ============================================================================
+# PPG+ECG to BP Multi-Source Direction Configuration
+# ============================================================================
+#
+# Purpose:
+#   Multi-source direction configuration for PPG and ECG to BP (Blood Pressure)
+#   scalar estimation. Enables BPModel to use both PPG and ECG signals for
+#   blood pressure estimation (SBP, DBP, MAP) in scalar regression tasks.
+#
+# Inherits:
+#   - base_directions: Base direction configuration from ConfigStore
+#
+# Notes:
+#   - Multi-source direction: [PPG, ECG] → BP (scalar)
+#   - Used for scalar blood pressure estimation tasks
+#   - BPModel creates separate encoders for each vital and aggregates predictions
+#
+# ============================================================================
+
+defaults:
+  - base_directions
+  - _self_
+
+active_directions:
+  - _target_: src.core.domain.Direction
+    source: [PPG, ECG]
+    target: BP
+

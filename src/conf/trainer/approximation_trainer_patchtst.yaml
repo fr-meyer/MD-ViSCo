@@ -1,0 +1,53 @@
+# ============================================================================
+# PatchTST Approximation Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for PatchTST approximation (first-stage) training.
+#   Trains PatchTST model to generate initial waveform approximations from
+#   source signals using deep supervision loss.
+#
+# Inherits:
+#   - base_approximation_trainer: Base approximation trainer configuration
+#   - model: patchtst (PatchTST model)
+#
+# Notes:
+#   - Scheduler disabled (scheduler: null) for fixed learning rate
+#   - Batch size: 32 (optimized for PatchTST architecture)
+#   - Learning rate: 2e-3 (higher than default for PatchTST)
+#   - Early stopping patience: 10 epochs
+#
+# ============================================================================
+
+defaults:
+  - base_approximation_trainer
+  - /model@model: patchtst
+  - _self_
+scheduler: null
+
+batch_size: 32
+learning_rate: 2e-3
+
+early_stopping:
+  patience: 10
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=approximation_trainer_patchtst \
+#      train_dataset=train_uci
+#
+# 2. Override direction:
+#    python -m src.train trainer=approximation_trainer_patchtst \
+#      directions=ecg2abp
+#
+# 3. Override learning rate or batch size:
+#    python -m src.train trainer=approximation_trainer_patchtst \
+#      learning_rate=1e-3 \
+#      batch_size=64
+#
+# 4. Override model parameters:
+#    python -m src.train trainer=approximation_trainer_patchtst \
+#      model.d_model=256 \
+#      model.num_encoder_layers=4
+# ============================================================================

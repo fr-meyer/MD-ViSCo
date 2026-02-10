@@ -1,0 +1,30 @@
+# ============================================================================
+# PatchTST Inference-Scale Model - Unified Configuration
+# ============================================================================
+# Stage1 and stage2 both use patchtst; stage2 overrides num_targets=2 for BP output.
+# Architecture: Stage1 (approximation) → waveform; Stage2 (refinement) → SBP/DBP;
+# Unscaling: waveform unscaled using SBP as max and DBP as min.
+# Paper: Nie et al. 2022, Section A.1.4 (d_model=128, layers=3, heads=16, dropout=0.2)
+# Datasets: UCI (1024) | PulseDB (1280) | MIMIC-Perform-Large (4000)
+# Validation: Needs verification
+#
+# Params set here:
+#   stage2_model.num_targets: 2
+#   model_name: PatchTSTTwoStageScaling
+#
+# Usage:
+#   python -m src.test evaluator=scaling_two_stage_uci_evaluator model@evaluator.model=patchtst_inference_scale train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_two_stage_scaling_model
+  - /model@stage1_model: patchtst
+  - /model@stage2_model: patchtst
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+# Stage2 (refinement) outputs SBP and DBP
+stage2_model:
+  num_targets: 2
+
+model_name: PatchTSTTwoStageScaling

@@ -1,0 +1,37 @@
+# ============================================================================
+# Checkpoint IO Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for checkpoint input/output operations.
+#   Composes base_checkpoint_io from the Hydra ConfigStore to provide
+#   checkpoint loading and saving parameters for model checkpoints.
+#
+# Inherits:
+#   - base_checkpoint_io: Base checkpoint IO configuration from ConfigStore
+#
+# Notes:
+#   - Defines how checkpoints are loaded and saved during training/inference
+#   - Used by checkpoint managers to handle checkpoint file operations
+#
+# ============================================================================
+
+defaults:
+  - base_checkpoint_io
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer/evaluator configs via Hydra defaults:
+#    defaults:
+#      - checkpoint_io: checkpoint_io
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      checkpoint_io=checkpoint_io
+#
+# 3. Override checkpoint paths:
+#    python src/train.py checkpoint_io=checkpoint_io \
+#      checkpoint_io.load_path=/path/to/checkpoint.pth
+# ============================================================================
+

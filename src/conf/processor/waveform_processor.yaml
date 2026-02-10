@@ -1,0 +1,49 @@
+# ============================================================================
+# Waveform Processor Configuration
+# ============================================================================
+#
+# Purpose:
+#   WaveformOutputProcessor configuration for waveform regression tasks.
+#   Base waveform processor with no BP extractor, typically used by
+#   approximation trainers. Processes continuous waveform predictions
+#   (PPG→ABP, ECG→ABP, etc.).
+#
+# Inherits:
+#   - base_waveform_processor: Base waveform processor configuration
+#     (WaveformProcessorConfig)
+#
+# Notes:
+#   - Unified processor interface (process()) handles all stages:
+#     * stage="train": minimal parsing, no trimming unless trainer requests full metrics
+#     * stage="val"/"test": full trimming, scalar extraction, optional metrics
+#   - Models that predict continuous waveforms should use this processor
+#   - Sibling variants exist for specific use cases:
+#     * waveform_processor_ref: adds BP extractor for BP scalar extraction
+#     * waveform_processor_ecg_features: adds ECG feature extraction
+#     * waveform_processor_ppg_features: adds PPG feature extraction
+#
+# ============================================================================
+
+defaults:
+  - base_waveform_processor
+
+# Stage-aware processing notes:
+# - trainer passes stage into processor.process()
+# - enable compute_full_metrics_during_train on the trainer to run trimming/metrics inside stage="train"
+# - metrics respect compute_metrics + enabled_directions flags defined below
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /processor@processor: waveform_processor
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      processor=waveform_processor
+#
+# 3. Use sibling variants for specific needs:
+#    python src/train.py processor=waveform_processor_ref  # Adds BP extractor
+#    python src/train.py processor=waveform_processor_ecg_features  # Adds ECG features
+#    python src/train.py processor=waveform_processor_ppg_features  # Adds PPG features
+# ============================================================================

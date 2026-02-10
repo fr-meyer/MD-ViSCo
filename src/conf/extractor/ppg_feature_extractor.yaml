@@ -1,0 +1,52 @@
+# ============================================================================
+# PPG Feature Extractor Configuration
+# ============================================================================
+#
+# Purpose:
+#   Extracts Asp_deltaT (onset-to-peak delay) and IPR (inflection point ratio)
+#   from PPG waveforms. Used for PPG waveform reconstruction tasks that also
+#   extract vascular features (e.g., ECG→PPG models that need arterial stiffness
+#   and compliance markers).
+#
+# Inherits:
+#   - base_ppg_feature_extractor: Base PPG feature extractor configuration
+#     (from src/processors/extractors.py)
+#
+# Notes:
+#   - Low cutoff fL is 0.5 Hz; code uses 0.5000001 for filter stability
+#     (epsilon avoids numerical edge cases in the Butterworth design)
+#   - Clinical context: Asp_deltaT pulse onset to systolic peak (arterial stiffness);
+#     IPR vascular compliance; VPG/APG/JPG derivatives for fiducial detection
+#   - Typical ranges: Asp_deltaT 0.1–0.3 s, IPR 0.3–0.7
+#   - Used by waveform_processor_ppg_features processor
+#   - Output structure includes Asp_deltaT and IPR arrays per sample
+#
+# ============================================================================
+
+defaults:
+  - base_ppg_feature_extractor
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in processor configs via Hydra defaults:
+#    defaults:
+#      - /extractor@extractor: ppg_feature_extractor
+#    (e.g., waveform_processor_ppg_features)
+#
+# 2. Override extractor parameters via CLI:
+#    python src/train.py processor=waveform_processor_ppg_features \
+#      processor.extractor.fL=0.7 processor.extractor.fH=15.0
+#    python src/train.py processor=waveform_processor_ppg_features \
+#      processor.extractor.sm_wins.ppg=70
+#    python src/train.py processor=waveform_processor_ppg_features \
+#      processor.extractor.strict_mode=false
+#
+# 3. Adjust smoothing for noisy signals:
+#    python src/train.py processor=waveform_processor_ppg_features \
+#      processor.extractor.sm_wins.ppg=70 \
+#      processor.extractor.sm_wins.vpg=15
+#
+# 4. Reference:
+#    Parameters and output schema: see src.processors.extractors.PPGFeatureExtractor
+# ============================================================================

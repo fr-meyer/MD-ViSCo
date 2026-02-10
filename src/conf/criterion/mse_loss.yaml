@@ -1,4 +1,35 @@
-# MSE Loss configuration
+# ============================================================================
+# MSE Loss Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for MSE (Mean Squared Error) loss. Composes
+#   base_mse_loss from the Hydra ConfigStore to provide MSE loss parameters
+#   for model training.
+#
+# Inherits:
+#   - base_mse_loss: Base MSE loss configuration from ConfigStore
+#
+# Notes:
+#   - MSE loss penalizes large errors more heavily than L1 loss
+#   - Commonly used for regression tasks and waveform reconstruction
+#
+# ============================================================================
+
 defaults:
   - base_mse_loss
   - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /criterion@criterion: mse_loss
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      criterion=mse_loss
+#
+# 3. Override loss weight if needed:
+#    python src/train.py criterion=mse_loss criterion.weight=1.0
+# ============================================================================

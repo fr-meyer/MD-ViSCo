@@ -1,0 +1,62 @@
+# ============================================================================
+# PatchTST Refinement Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for PatchTST refinement (second-stage) training.
+#   Fine-tunes PatchTST model to predict scalar values (SBP and DBP) from
+#   waveforms using multi-weighted contrastive loss.
+#
+# Inherits:
+#   - base_refinement_scalar: Base scalar refinement trainer configuration
+#   - model: patchtst (PatchTST model)
+#
+# Notes:
+#   - Model outputs 2 targets: SBP and DBP (num_targets: 2)
+#   - Scheduler disabled (scheduler: null) for fixed learning rate
+#   - Batch size: 32 (optimized for PatchTST architecture)
+#   - Learning rate: 2e-3 (higher than default for PatchTST)
+#   - Early stopping patience: 10 epochs
+#   - Fine-tunes from approximation checkpoints
+#
+# ============================================================================
+
+defaults:
+  - base_refinement_scalar
+  - /model@model: patchtst
+  - _self_
+
+# Refinement outputs SBP and DBP
+model:
+  num_targets: 2
+
+scheduler: null
+
+batch_size: 32
+learning_rate: 2e-3
+
+early_stopping:
+  patience: 10
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=refinement_trainer_patchtst \
+#      train_dataset=train_uci_refinement_bp \
+#      checkpoint_managers.load.base_dir=/path/to/approximation/checkpoints
+#
+# 2. Override direction:
+#    python -m src.train trainer=refinement_trainer_patchtst \
+#      directions=ecg2abp
+#
+# 3. Override training parameters:
+#    python -m src.train trainer=refinement_trainer_patchtst \
+#      learning_rate=1e-3 \
+#      batch_size=64 \
+#      early_stopping.patience=20
+#
+# 4. Override checkpoint loading:
+#    python -m src.train trainer=refinement_trainer_patchtst \
+#      checkpoint_managers.load.base_dir=/custom/path \
+#      checkpoint_managers.load.trainer_name=WaveRecApp
+# ============================================================================

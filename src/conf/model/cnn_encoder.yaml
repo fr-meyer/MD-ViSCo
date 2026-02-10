@@ -1,0 +1,23 @@
+# ============================================================================
+# CNN Encoder - Unified Configuration
+# ============================================================================
+# CNN feature encoder for AF classification; Stage1 in cascade; outputs [B, 256×(input_size/8)].
+#
+# Validation: Needs verification
+# Datasets: UCI (1024) | PulseDB (1280)
+#
+# Params set here (source):
+#   input_length → dataset via Hydra oc.select
+#   All architecture params inherited from base_cnn_encoder dataclass defaults
+#
+# Usage:
+#   torchrun --standalone --nproc_per_node=1 --module src.train -m model=cnn_encoder \
+#     trainer=classification_trainer train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_cnn_encoder
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}

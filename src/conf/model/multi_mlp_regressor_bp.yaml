@@ -1,0 +1,47 @@
+# ============================================================================
+# Multi-MLP Regressor BP - Unified Configuration
+# ============================================================================
+# Dual MLP heads for SBP/DBP prediction from extracted features (Stage 2 in cascade).
+#
+# Paper: Mahmud et al. 2022, A Shallow U-Net for BP from PPG/ECG (arXiv:2111.08480)
+# Validation: Validated 2026-01-31
+#
+# Params set here (source):
+#   input_length: 1024 → dummy value for BaseModel (required by BaseModel but not used by MultiMLPRegressor)
+#   mlp_heads: 2×MLPRegressor (input_length: 1024, hidden_size: 100) → Mahmud et al. 2022, Supp. Table 2
+#   activation: relu, alpha: 0.0001 → paper parameters
+#
+# Notes:
+#   - Output format: Dict with keys 'y_pred_sbp' [B,1] and 'y_pred_dbp' [B,1]. Canonical for stage-2 BP refinement; [B,2] no longer supported.
+#
+# Usage:
+#   torchrun --standalone --nproc_per_node=1 --module src.train -m model=multi_mlp_regressor_bp \
+#     trainer=refinement_trainer_nabnet train_dataset=... test_dataset=...
+# ============================================================================
+
+defaults:
+  - base_multi_mlp_regressor
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+model_name: MultiMLPRegressorBP
+
+input_length: 1024
+
+mlp_heads:
+  - _target_: src.model.nabnet.MLPRegressor
+    name: sbp
+    model_name: mlp_head_sbp
+    checkpoint_io:
+      _target_: src.utils.checkpoint_io.CheckpointIO
+      safe_only: false
+    input_length: 1024
+    hidden_size: 100
+  - _target_: src.model.nabnet.MLPRegressor
+    name: dbp
+    model_name: mlp_head_dbp
+    checkpoint_io:
+      _target_: src.utils.checkpoint_io.CheckpointIO
+      safe_only: false
+    input_length: 1024
+    hidden_size: 100

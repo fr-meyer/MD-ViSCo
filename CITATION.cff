@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+type: software
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Meyer
+    given-names: Franck
+  - family-names: Hur
+    given-names: Kyunghoon
+  - family-names: Choi
+    given-names: Edward
+title: "MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion"
+version: 3.0.0
+# Before publishing a release: set date-released to the actual release date (YYYY-MM-DD).
+date-released: 2026-02-10
+url: "https://github.com/fr-meyer/MD-ViSCo"
+repository-code: "https://github.com/fr-meyer/MD-ViSCo"
+keywords:
+  - vital signs
+  - waveform conversion
+  - deep learning
+  - ECG
+  - PPG
+  - ABP
+  - IMP
+  - atrial fibrillation classification
+license: MIT
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Meyer
+      given-names: Franck
+    - family-names: Hur
+      given-names: Kyunghoon
+    - family-names: Choi
+      given-names: Edward
+  title: "MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion"
+  year: 2025
+  url: "https://arxiv.org/abs/2506.08357"

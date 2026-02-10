@@ -1,0 +1,27 @@
+# ============================================================================
+# NABNet Inference-Scale - Unified Configuration
+# ============================================================================
+# Two-stage scaling for BP waveform (inference): NABNet approximation → NABNet refinement; waveform unscaled using SBP/DBP.
+#
+# Validation: Needs verification
+# Datasets: UCI (1024) | PulseDB (1280)
+#
+# Params set here (source):
+#   stage1_model: nabnet_approximation, stage2_model: nabnet_refinement → composition
+#
+# Notes:
+#   - For inference only; waveform unscaled using predicted SBP/DBP.
+#
+# Usage:
+#   torchrun --module src.train -m model=nabnet_inference_scale trainer=... \
+#     train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_two_stage_scaling_model
+  - /model@stage1_model: nabnet_approximation
+  - /model@stage2_model: nabnet_refinement
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+model_name: NABNetTwoStageScaling

@@ -1,0 +1,28 @@
+# ============================================================================
+# PPG+ECG Multi-Source to ABP Direction Configuration
+# ============================================================================
+#
+# Purpose:
+#   Multi-source direction configuration for PPG and ECG to ABP (Arterial Blood
+#   Pressure) waveform transformation. Defines a single direction mapping that
+#   uses both PPG and ECG as combined source signals to predict ABP targets.
+#
+# Inherits:
+#   - base_directions: Base direction configuration from ConfigStore
+#
+# Notes:
+#   - Multi-source direction: [PPG, ECG] → ABP
+#   - Uses both PPG and ECG signals simultaneously as input
+#   - Used for multi-source training where models leverage multiple signals
+#
+# ============================================================================
+
+defaults:
+  - base_directions
+  - _self_
+
+active_directions:
+  - _target_: src.core.domain.Direction
+    source: [PPG, ECG]
+    target: ABP
+

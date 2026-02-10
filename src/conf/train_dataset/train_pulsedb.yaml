@@ -1,24 +1,65 @@
-# PulseDB dataset configuration
-# This file is automatically loaded when dataset=pulsedb is specified
+# ============================================================================
+# PulseDB Training Dataset Configuration
+# ============================================================================
+#
+# Purpose:
+#   Training dataset configuration for PulseDB. Inherits base PulseDB settings
+#   and defines training-specific preprocessing and data loading parameters.
+#
+# Inherits:
+#   - base_pulsedb: Base PulseDB dataset configuration
+#
+# Notes:
+#   - BP normalization: dbp_min and sbp_max define the dataset's BP value ranges
+#     used for denormalization during inference. These values are automatically
+#     sourced from the base dataset config (base_pulsedb) and used by processors
+#     to convert normalized predictions back to mmHg.
+#   - PulseDB BP range: DBP 2.34 mmHg, SBP up to 286.58 mmHg
+#   - Default split: 80% train, 20% validation, 0% test
+#
+# ============================================================================
 
 defaults:
-  - /vitals_dataset@vitals_dataset: vitals_pulsedb
   - base_pulsedb
   - _self_
 
-# The actual configuration values will be loaded from PulseDBConfig defaults
-# You can override any values here if needed
-
-
-
-input_size: 1280
+input_preprocessing:
+  source:
+    - vital: "ecg"
+      norm: "minmax_zc"
+    - vital: "ppg"
+      norm: "minmax_zc"
+    - vital: "abp"
+      norm: "minmax_zc"
+  target:
+    - vital: "ecg"
+      norm: "minmax_zc"
+    - vital: "ppg"
+      norm: "minmax_zc"
+    - vital: "abp"
+      norm: "minmax_zc"
+  include:
+    - bp_raw
 
 dataset_path: ???
-dataset_folder: "PulseDB/mdvisco"
-file_name: "PulseDB_Train_Subset.h5"
-# Split ratios moved from common config
+file_name: "Train_Subset.h5"
 train_ratio: 0.80
 val_ratio: 0.20
 test_ratio: 0.0
-# Splitting strategy flags moved from common config
-use_patient_split: false
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - train_dataset: train_pulsedb
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      train_dataset=train_pulsedb \
+#      train_dataset.dataset_path=/path/to/pulsedb/data
+#
+# 3. Override preprocessing or split ratios:
+#    python src/train.py train_dataset=train_pulsedb \
+#      train_dataset.train_ratio=0.75 \
+#      train_dataset.val_ratio=0.25
+# ============================================================================

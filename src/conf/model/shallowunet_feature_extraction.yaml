@@ -1,0 +1,29 @@
+# ============================================================================
+# ShallowUNet Feature Extraction Model – Unified Configuration
+# ============================================================================
+# Paper: A Shallow U-Net Architecture for Reliably Predicting Blood Pressure (BP)... (arXiv:2111.08480, §IV.A)
+# Validation: Validated 2026-01-31
+# Datasets: UCI (1024) | PulseDB (1280)
+#
+# Params set here (source):
+#   feature_extraction_only=true, use_transconv=false (feature extraction mode)
+#   feature_number=1024, autoencoder=1, deep_supervision=0, guided_attention=0, use_lstm=0, alpha=1 (config overrides)
+#   Other params from base_shallow_unet
+#
+# Notes:
+#   - Returns 2D features [B, 1024] instead of waveforms; used as Stage1 in cascade models
+#   - Paper default model_width=128; override via model.model_width=84 if needed
+#
+# Usage:
+#   torchrun --module src.train -m model=shallowunet_feature_extraction trainer=approximation_trainer_mdvisco train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_shallow_unet
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+model_name: ShallowUNetFeatureExtraction
+input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}
+feature_extraction_only: true
+use_transconv: false

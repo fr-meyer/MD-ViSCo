@@ -1,0 +1,48 @@
+# ============================================================================
+# Waveform Processor ECG Features Configuration
+# ============================================================================
+#
+# Purpose:
+#   WaveformOutputProcessor with ECG feature extraction. Used for ECG waveform
+#   reconstruction tasks that also extract clinical features (e.g., PPG→ECG
+#   models that need R-peak detection and QT interval analysis).
+#   Processes continuous waveform predictions and extracts R-peaks, QT intervals,
+#   and ECG quality metrics.
+#
+# Inherits:
+#   - base_waveform_processor: Base waveform processor configuration
+#     (WaveformProcessorConfig)
+#   - ecg_feature_extractor: ECG feature extractor for R-peaks, QT intervals,
+#     and signal quality
+#
+# Notes:
+#   - Unified processor interface (process()) handles all stages:
+#     * stage="train": minimal parsing, no trimming unless trainer requests full metrics
+#     * stage="val"/"test": full trimming, scalar extraction, optional metrics
+#   - Output structure includes:
+#     * waveform: Reconstructed ECG waveform [B, C, T]
+#     * peak_locations: Nested dict with R/P/T/Q/S wave fiducials
+#     * qt_intervals: Array of QT durations per sample
+#     * mean_ecg_quality: Signal quality scores per sample
+#
+# ============================================================================
+
+defaults:
+  - base_waveform_processor
+  - /extractor@extractor: ecg_feature_extractor
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /processor@processor: waveform_processor_ecg_features
+#
+# 2. Override extractor parameters via CLI:
+#    python src/train.py processor=waveform_processor_ecg_features \
+#      processor.extractor.sampling_rate=500 \
+#      processor.extractor.strict_mode=false
+#
+# 3. Enable metrics for evaluation:
+#    python src/train.py processor=waveform_processor_ecg_features \
+#      processor.compute_metrics=true
+# ============================================================================

@@ -1,0 +1,73 @@
+# ============================================================================
+# Base MimicPERFormAF Dataset Configuration
+# ============================================================================
+#
+# Purpose:
+#   Base configuration providing default values for MimicPERFormAF dataset configs.
+#   Defines dataset-specific parameters including input size, splitting strategies,
+#   and AF classification task configuration.
+#
+# Base:
+#   - _target_: src.dataset.mimicperformaf_dataset.MimicPERFormAFConfig
+#
+# Notes:
+#   - This dataset is used for AF classification, not BP prediction
+#   - Input size: 1024 samples (default, can be overridden in specific configs,
+#     e.g., 1250-sample segments)
+#   - BP normalization bounds are placeholder values required by base config
+#     but unused for this dataset
+#   - Default split: 80% train, 20% validation, 0% test
+#   - Supports patient-level splitting (use_patient_split: true)
+#
+# ============================================================================
+
+_target_: src.dataset.mimicperformaf_dataset.MimicPERFormAFConfig
+dataset_name: MimicPERFormAF
+
+# Input size for models (controls automatic padding/trimming)
+# Default to 1024 for compatibility with existing models
+# Can be overridden in specific configs (e.g., 1250-sample segments)
+input_size: 1024
+
+# BP normalization bounds (placeholder values for AF classification dataset)
+# This dataset is used for AF classification, not BP prediction
+# Values are required by base config but unused for this dataset
+dbp_min: 50.0
+sbp_max: 189.98421357007769
+
+# File path structure
+dataset_folder: MIMIC_PERform/AF/mdvisco_processed/
+
+# AF-specific configuration
+task_type: classification
+
+# Dataset splitting configuration
+# All ratios must be between 0.0 and 1.0, and must sum to 1.0
+train_ratio: 0.80
+val_ratio: 0.20
+test_ratio: 0.0
+
+# Splitting strategy flags
+# This dataset supports patient-level splitting
+use_patient_split: true
+use_nabnet_vanilla_split: false
+
+# Trimming strategy (only used when trimming is needed)
+trim_strategy: center
+
+# Usage Examples
+# ============================================================================
+# 1. Inherit in dataset configs via Hydra defaults:
+#    defaults:
+#      - base_mimicperformaf
+#      - _self_
+#
+# 2. Override specific parameters:
+#    python src/train.py train_dataset=train_mimic_perform_af_1024 \
+#      train_dataset.train_ratio=0.75 \
+#      train_dataset.val_ratio=0.25
+#
+# 3. Override input size (e.g., for 1250-sample segments):
+#    python src/train.py train_dataset=train_mimic_perform_af_1250 \
+#      train_dataset.input_size=1250
+# ============================================================================

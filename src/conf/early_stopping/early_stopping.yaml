@@ -1,3 +1,39 @@
+# ============================================================================
+# Early Stopping Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for early stopping. Composes base_early_stopping
+#   from the Hydra ConfigStore to provide early stopping parameters for
+#   preventing overfitting during model training.
+#
+# Inherits:
+#   - base_early_stopping: Base early stopping configuration from ConfigStore
+#
+# Notes:
+#   - Monitors a validation metric and stops training when no improvement is detected
+#   - Helps prevent overfitting and reduces unnecessary training time
+#   - Can be configured with patience, mode, and minimum delta parameters
+#
+# ============================================================================
+
 defaults:
   - base_early_stopping
   - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - early_stopping: early_stopping
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      early_stopping=early_stopping
+#
+# 3. Override early stopping parameters:
+#    python src/train.py early_stopping=early_stopping \
+#      early_stopping.patience=10 \
+#      early_stopping.mode=min \
+#      early_stopping.min_delta=0.001
+# ============================================================================

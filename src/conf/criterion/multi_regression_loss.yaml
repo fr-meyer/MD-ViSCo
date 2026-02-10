@@ -1,4 +1,37 @@
-# Multi Regression Loss configuration
+# ============================================================================
+# Multi Regression Loss Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for multi-regression loss. Composes base multi
+#   regression loss from the Hydra ConfigStore to provide loss parameters
+#   for models predicting multiple regression targets simultaneously.
+#
+# Inherits:
+#   - base_multi_regression_loss: Base multi-regression loss configuration from ConfigStore
+#
+# Notes:
+#   - Used for models that predict multiple scalar outputs (e.g., SBP, DBP, MAP)
+#   - Combines individual regression losses for each target
+#   - Commonly used for blood pressure estimation tasks
+#
+# ============================================================================
+
 defaults:
   - base_multi_regression_loss
   - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /criterion@criterion: multi_regression_loss
+#
+# 2. Command line override:
+#    python src/train.py trainer=scalar_regression_trainer \
+#      criterion=multi_regression_loss
+#
+# 3. Override loss weights for different targets:
+#    python src/train.py criterion=multi_regression_loss \
+#      criterion.weights=[1.0,1.0,0.5]
+# ============================================================================

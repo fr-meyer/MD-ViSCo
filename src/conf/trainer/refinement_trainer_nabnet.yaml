@@ -1,0 +1,54 @@
+# ============================================================================
+# NABNet Refinement Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for NABNet refinement (second-stage) training.
+#   Fine-tunes NABNet model to predict scalar values (e.g., blood pressure)
+#   from waveforms using multi-weighted contrastive loss.
+#
+# Inherits:
+#   - base_refinement_scalar: Base scalar refinement trainer configuration
+#   - model: nabnet_inference_scale (NABNet inference scale model)
+#
+# Notes:
+#   - Scheduler disabled (scheduler: null) for fixed learning rate
+#   - Batch size: 32 (optimized for NABNet architecture)
+#   - Early stopping patience: 20 epochs
+#   - Fine-tunes from approximation checkpoints
+#
+# ============================================================================
+
+defaults:
+  - base_refinement_scalar
+  - /model@model: nabnet_inference_scale
+  - _self_
+
+scheduler: null
+
+batch_size: 32
+
+early_stopping:
+  patience: 20
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=refinement_trainer_nabnet \
+#      train_dataset=train_uci_refinement_bp \
+#      checkpoint_managers.load.base_dir=/path/to/approximation/checkpoints
+#
+# 2. Override direction:
+#    python -m src.train trainer=refinement_trainer_nabnet \
+#      directions=ecg2abp
+#
+# 3. Override training parameters:
+#    python -m src.train trainer=refinement_trainer_nabnet \
+#      batch_size=64 \
+#      early_stopping.patience=30
+#
+# 4. Override checkpoint loading:
+#    python -m src.train trainer=refinement_trainer_nabnet \
+#      checkpoint_managers.load.base_dir=/custom/path \
+#      checkpoint_managers.load.trainer_name=WaveRecApp
+# ============================================================================

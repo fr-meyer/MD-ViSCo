@@ -1,0 +1,55 @@
+# ============================================================================
+# ShallowUNet Refinement Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for ShallowUNet refinement (second-stage) training.
+#   Fine-tunes ShallowUNet model to improve waveform quality from initial
+#   approximations using multi-weighted contrastive loss.
+#
+# Inherits:
+#   - base_refinement_waveform: Base waveform refinement trainer configuration
+#   - model: shallowunet (ShallowUNet model)
+#
+# Notes:
+#   - Scheduler disabled (scheduler: null) for fixed learning rate
+#   - Batch size: 32 (optimized for ShallowUNet architecture)
+#   - Early stopping patience: 20 epochs
+#   - Fine-tunes from approximation checkpoints
+#
+# ============================================================================
+
+defaults:
+  - base_refinement_waveform
+  - /model@model: shallowunet
+  - _self_
+
+
+scheduler: null
+
+batch_size: 32
+
+early_stopping:
+  patience: 20
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=refinement_trainer_shallowunet \
+#      train_dataset=train_uci_refinement_abp \
+#      checkpoint_managers.load.base_dir=/path/to/approximation/checkpoints
+#
+# 2. Override direction:
+#    python -m src.train trainer=refinement_trainer_shallowunet \
+#      directions=ecg2abp
+#
+# 3. Override training parameters:
+#    python -m src.train trainer=refinement_trainer_shallowunet \
+#      batch_size=64 \
+#      early_stopping.patience=30
+#
+# 4. Override checkpoint loading:
+#    python -m src.train trainer=refinement_trainer_shallowunet \
+#      checkpoint_managers.load.base_dir=/custom/path \
+#      checkpoint_managers.load.trainer_name=WaveRecApp
+# ============================================================================

@@ -1,8 +1,26 @@
+# ============================================================================
+# ECG to PPG Direction Configuration
+# ============================================================================
+#
+# Purpose:
+#   Direction configuration for ECG to PPG (Photoplethysmography) waveform
+#   transformation. Defines a single-direction mapping from ECG source signals
+#   to PPG target waveforms for model training and inference.
+#
+# Inherits:
+#   - base_directions: Base direction configuration from ConfigStore
+#
+# Notes:
+#   - Single-source direction: ECG → PPG
+#   - Used for waveform reconstruction tasks
+#
+# ============================================================================
+
 defaults:
   - base_directions
   - _self_
 
 active_directions:
   - _target_: src.core.domain.Direction
-    src: ECG
-    tgt: PPG
+    source: [ECG]
+    target: PPG

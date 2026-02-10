@@ -1,10 +1,41 @@
-# src/conf/wandb_wrapper/wandb.yaml
+# ============================================================================
+# WandB Logging Configuration – Entry Point
+# ============================================================================
+# This config serves as the WandB logging entrypoint, composing defaults from
+# base_wandb_wrapper (defined in src/loggings/wandb_wrapper.py) and allowing
+# field overrides via Hydra CLI.
+#
+# Defaults Composition:
+#   - base_wandb_wrapper: Provides WandBWrapperConfig defaults (wandb_enabled=false,
+#     _target_ pointing to WandBWrapper class, etc.)
+#   - _self_: Allows this file to override base defaults
+#
+# Fields:
+#   entity: WandB entity/team name (required, set via CLI or config override)
+#   project_name: WandB project name (required, set via CLI or config override)
+#   wandb_enabled: Enable/disable WandB logging (default: true)
+#   run_name: Optional run name for this experiment (default: None, auto-generated)
+#
+# Usage Examples:
+#   # Override entity and project name
+#   torchrun --standalone --nproc_per_node=1 --module src.train -m \
+#     wandb_wrapper.wandb.entity=my_team \
+#     wandb_wrapper.wandb.project_name=my_project
+#
+#   # Disable WandB logging
+#   torchrun --standalone --nproc_per_node=1 --module src.train -m \
+#     wandb_wrapper.wandb.wandb_enabled=false
+#
+#   # Set custom run name
+#   torchrun --standalone --nproc_per_node=1 --module src.train -m \
+#     wandb_wrapper.wandb.run_name=experiment_v1
+# ============================================================================
 
 defaults:
   - base_wandb_wrapper
   - _self_
 
-entity: ???
-project_name: ???
-run_name: null
-wandb_enabled: true
+entity: ???  # WandB entity/team name (required)
+project_name: ???  # WandB project name (required)
+wandb_enabled: true  # Enable WandB logging
+run_name: null  # Optional run name (auto-generated if not set)

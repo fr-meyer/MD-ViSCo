@@ -1,0 +1,30 @@
+# ============================================================================
+# ShallowUNet Model – Unified Configuration
+# ============================================================================
+# Paper: A Shallow U-Net Architecture for Reliably Predicting Blood Pressure (BP) from PPG and ECG Signals (arXiv:2111.08480, §IV.A)
+# Validation: Validated 2026-01-31
+# Datasets: UCI (1024) | PulseDB (1280)
+#
+# Params set here (source):
+#   input_length → dataset via Hydra
+#   model_name → identification override
+#   All other params from base_shallow_unet (ShallowUNetModelConfig) dataclass defaults
+#
+# Notes:
+#   - Paper defaults (model_width=128, model_depth=1) in base_shallow_unet
+#   - Refinement stage for waveform-to-waveform conversion; use_transconv=true
+#
+# Usage:
+#   torchrun --module src.train -m model=shallowunet trainer=refinement_trainer_shallowunet train_dataset=train_uci_refinement_abp test_dataset=test_uci_refinement_abp
+# ============================================================================
+
+defaults:
+  - base_shallow_unet
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+# Model identification
+model_name: ShallowUNet
+
+# Input configuration - dynamically adapts to dataset
+input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}  # Dynamically adapts to dataset with fallback (UCI: 1024, PulseDB: 1280)

@@ -1,3 +1,25 @@
+# ============================================================================
+# PPG2ABP Approximation Model (UNetDS64) – Unified Configuration
+# ============================================================================
+# Paper: PPG2ABP: Translating Photoplethysmogram (PPG) Signals to Arterial Blood Pressure (ABP) Waveforms... (arXiv:2005.01669v2, §3.3)
+# Validation: Validated 2026-01-29
+# Datasets: UCI (1024) | PulseDB (1280)
+#
+# Params set here (source):
+#   input_length → dataset via Hydra
+#
+# Notes:
+#   - base_channels=64 from base_unet_ds64 (paper §3.3); filter progression: [64, 128, 256, 512, 1024]
+#   - Override to experimental variant: model.base_channels=96
+#
+# Usage:
+#   torchrun --module src.train -m model=ppg2abp_approximation trainer=approximation_trainer train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
 defaults:
   - base_unet_ds64
+  - /checkpoint_io@checkpoint_io: checkpoint_io
   - _self_
+
+# Model architecture parameters
+input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}  # Dynamically adapts to dataset with fallback

@@ -1,0 +1,30 @@
+# ============================================================================
+# PPG↔ECG Bidirectional Configuration
+# ============================================================================
+#
+# Purpose:
+#   Bidirectional configuration for PPG and ECG waveform transformation.
+#   Defines direction mappings enabling models to predict PPG from ECG and
+#   vice versa, supporting bidirectional learning between these signals.
+#
+# Inherits:
+#   - base_directions: Base direction configuration from ConfigStore
+#
+# Notes:
+#   - Bidirectional directions: PPG → ECG, ECG → PPG
+#   - Used for bidirectional training where models learn transformations
+#     in both directions simultaneously
+#
+# ============================================================================
+
+defaults:
+  - base_directions
+  - _self_
+
+active_directions:
+  - _target_: src.core.domain.Direction
+    source: [PPG]
+    target: ECG
+  - _target_: src.core.domain.Direction
+    source: [ECG]
+    target: PPG

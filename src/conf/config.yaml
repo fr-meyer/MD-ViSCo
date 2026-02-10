@@ -1,17 +1,37 @@
-# Base configuration for MD-ViSCo training
-# This file serves as the main entry point for Hydra configuration
+# ============================================================================
+# MD-ViSCo Training Configuration
+# ============================================================================
+#
+# Purpose:
+#   Main entry point configuration for MD-ViSCo training. Composes base_config
+#   and defines default dataset, trainer, and training parameters for model
+#   training workflows.
+#
+# Inherits:
+#   - base_config: Base configuration from ConfigStore
+#   - train_dataset: Training dataset configuration (default: train_uci)
+#   - test_dataset: Test dataset configuration (default: test_uci)
+#   - trainer: Trainer configuration (default: approximation_trainer_mdvisco)
+#
+# Notes:
+#   - This is the primary entry point for training scripts
+#   - Dataset paths and other required parameters must be provided via CLI
+#   - Input preprocessing configuration supports lazy normalization at batch time
+#
+# ============================================================================
 
 defaults:
   - base_config
   - train_dataset: train_uci  # ← Add dataset defaults
   - test_dataset: test_uci  # ← Add dataset defaults
-  - trainer: approximation_trainer
+  - trainer: approximation_trainer_mdvisco
   - _self_
 
 # Common settings removed - all configuration moved to domain-specific configs
 
 train_dataset:
   dataset_path: ???
+  use_nabnet_vanilla_split: ???
   
 test_dataset:
   dataset_path: ???
@@ -20,20 +40,40 @@ trainer:
   # Logging configuration (moved from common config)
   logging_level: "INFO"
   log_file_path: "training.log"
-  max_source_channels: 1
   resume_training: false
   load_model_weights: false
   direction_mode: ??? # single or multi
   overwrite_checkpoint: ???
   strict_loading: true
-  use_patient_information: ???
+  use_patient_information: ???  # Enable patient information (demographics) in models that support it (MDViSCo BPModel with TextEncoder)
   
+  # Input preprocessing configuration for lazy normalization at batch time.
+  # See README.md → Advanced → Advanced Preprocessing for detailed documentation, examples, and available normalization types.
   input_preprocessing: ???
   
-  checkpoint_manager:
-    base_dir: ???
+  checkpoint_managers:
+    save:
+      base_dir: ???
   
   progress_bar:
     wandb_wrapper:  
       entity: ???
       project_name: ???
+    csv_wrapper: null
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training command:
+#    python src/train.py trainer=approximation_trainer_mdvisco \
+#      train_dataset=train_pulsedb \
+#      train_dataset.dataset_path=/path/to/data
+#
+# 2. Override trainer and dataset:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      train_dataset=train_uci \
+#      train_dataset.dataset_path=/path/to/uci/data
+#
+# 3. Override preprocessing configuration:
+#    python src/train.py train_dataset=train_pulsedb \
+#      trainer.input_preprocessing.source[0].norm=standardize
+# ============================================================================

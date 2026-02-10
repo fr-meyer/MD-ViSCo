@@ -1,0 +1,30 @@
+# ============================================================================
+# NABNet Approximation Model – Unified Configuration
+# ============================================================================
+# Paper: NABNet: A Nested Attention-guided BiConvLSTM network... (DOI: 10.1016/j.bspc.2022.104247, §3.4)
+# Validation: Validated 2026-01-31
+# Datasets: UCI (1024) | PulseDB (1280) | MIMIC-Perform-Large (4000, requires overrides)
+#
+# Params set here (source):
+#   input_length → dataset via Hydra
+#   model_name → identification override
+#   All other params (model_width=128, model_depth=5, etc.) from base_nabnet (NABNetModelConfig) dataclass defaults
+#
+# Notes:
+#   - Paper defaults (model_width=128) in base_nabnet (NABNetModelConfig)
+#   - MIMIC: override with model_depth=5, model_width=32, attention_type=lstm
+#
+# Usage:
+#   torchrun --module src.train -m model=nabnet_approximation trainer=approximation_trainer_nabnet train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_nabnet
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+# Model identification
+model_name: NabNet
+
+# Input configuration - dynamically adapts to dataset
+input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}  # Dynamically adapts to dataset with fallback (UCI: 1024, PulseDB: 1280, MIMIC: 4000)

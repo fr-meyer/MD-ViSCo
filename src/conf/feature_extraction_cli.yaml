@@ -1,0 +1,45 @@
+# ============================================================================
+# MD-ViSCo Feature Extraction CLI Configuration
+# ============================================================================
+#
+# Purpose:
+#   Main entry point configuration for MD-ViSCo feature extraction workflows.
+#   Composes base_config and defines default test dataset and feature extraction
+#   evaluator parameters for extracting features from trained models.
+#
+# Inherits:
+#   - base_config: Base configuration from ConfigStore
+#   - test_dataset: Test dataset configuration (default: test_uci)
+#   - evaluator: Feature extraction evaluator configuration (default: feature_extraction)
+#
+# Notes:
+#   - This is the primary entry point for feature extraction scripts
+#   - Dataset paths must be provided via CLI or override files
+#   - The evaluator defaults (feature_extraction.yaml) configure the processor extractor
+#
+# ============================================================================
+
+# @package _global_
+defaults:
+  - base_config
+  - test_dataset: test_uci
+  - /evaluator@evaluator: feature_extraction
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Basic feature extraction command:
+#    python -m src.test evaluator=feature_extraction \
+#      test_dataset=test_uci \
+#      test_dataset.dataset_path=/path/to/data
+#
+# 2. Override test dataset:
+#    python -m src.test evaluator=feature_extraction \
+#      test_dataset=test_pulsedb \
+#      test_dataset.dataset_path=/path/to/pulsedb/data
+#
+# 3. Override checkpoint and output settings:
+#    python -m src.test evaluator.checkpoint_managers.save.base_dir=/path/to/checkpoints \
+#      evaluator.progress_bar.wandb_wrapper.project_name=my_project
+# ============================================================================
+

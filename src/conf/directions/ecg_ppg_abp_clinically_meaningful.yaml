@@ -1,14 +1,33 @@
+# ============================================================================
+# ECG-PPG-ABP Clinically Meaningful Directions Configuration
+# ============================================================================
+#
+# Purpose:
+#   Multi-direction configuration for clinically meaningful ECG, PPG, and ABP
+#   waveform transformations. Defines a subset of direction mappings that
+#   represent clinically relevant signal transformations.
+#
+# Inherits:
+#   - base_directions: Base direction configuration from ConfigStore
+#
+# Notes:
+#   - Clinically meaningful directions: PPG→ECG, PPG→ABP, ECG→ABP
+#   - Focuses on directions that have clinical significance for vital sign
+#     monitoring and analysis
+#
+# ============================================================================
+
 defaults:
   - base_directions
   - _self_
 
 active_directions:
   - _target_: src.core.domain.Direction
-    src: PPG
-    tgt: ECG
+    source: [PPG]
+    target: ECG
   - _target_: src.core.domain.Direction
-    src: PPG
-    tgt: ABP
+    source: [PPG]
+    target: ABP
   - _target_: src.core.domain.Direction
-    src: ECG
-    tgt: ABP
+    source: [ECG]
+    target: ABP

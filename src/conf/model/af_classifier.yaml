@@ -1,0 +1,27 @@
+# ============================================================================
+# AF Classifier - Unified Configuration
+# ============================================================================
+# MLP-based atrial fibrillation classifier for MIMIC PERform AF; usable standalone or as Stage2 in cascade.
+#
+# Validation: Needs verification
+# Datasets: MIMIC PERform AF (AF vs non-AF labels); UCI/PulseDB not supported (no AF labels).
+#
+# Params set here (source):
+#   input_length → dataset (Hydra oc.select)
+#   All other params inherited from base_af_classifier dataclass defaults
+#
+# Notes:
+#   - For cascade usage, use af_classifier_cascade; stage2 input_length is set via cascade.
+#
+# Usage:
+#   torchrun --standalone --nproc_per_node=1 --module src.train -m model=af_classifier \
+#     trainer=classification_trainer train_dataset=train_mimic_perform_af_1024 \
+#     test_dataset=test_mimic_perform_af_1024
+# ============================================================================
+
+defaults:
+  - base_af_classifier
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}

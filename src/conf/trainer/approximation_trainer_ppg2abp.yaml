@@ -1,0 +1,49 @@
+# ============================================================================
+# PPG2ABP Approximation Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for PPG2ABP approximation (first-stage) training.
+#   Trains PPG2ABP model to generate initial ABP waveform approximations
+#   from PPG signals using deep supervision loss.
+#
+# Inherits:
+#   - base_approximation_trainer: Base approximation trainer configuration
+#   - model: ppg2abp_approximation (PPG2ABP approximation model)
+#
+# Notes:
+#   - Scheduler disabled (scheduler: null) for fixed learning rate
+#   - Early stopping patience: 20 epochs
+#   - Optimized for PPG to ABP waveform conversion
+#
+# ============================================================================
+
+defaults:
+  - base_approximation_trainer
+  - /model@model: ppg2abp_approximation
+  - _self_
+scheduler: null
+
+early_stopping:
+  patience: 20
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=approximation_trainer_ppg2abp \
+#      train_dataset=train_uci
+#
+# 2. Override direction (if model supports other directions):
+#    python -m src.train trainer=approximation_trainer_ppg2abp \
+#      directions=ecg2abp
+#
+# 3. Override training parameters:
+#    python -m src.train trainer=approximation_trainer_ppg2abp \
+#      batch_size=64 \
+#      learning_rate=1e-3 \
+#      early_stopping.patience=30
+#
+# 4. Override model parameters:
+#    python -m src.train trainer=approximation_trainer_ppg2abp \
+#      model.init_features=128
+# ============================================================================

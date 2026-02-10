@@ -1,0 +1,26 @@
+# ============================================================================
+# MD-ViSCo Approximation Model – Unified Configuration
+# ============================================================================
+# Paper: MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion (arXiv:2506.08357, §6.2.1)
+# Validation: Validated 2026-01-29
+# Datasets: UCI (1024) | PulseDB (1280) | MIMIC-Perform-Large (4000)
+#
+# Params set here (source):
+#   input_length → dataset via Hydra oc.select
+#   All architecture params (in_channels, out_channels, init_features, etc.) → base_unet_swin_unet dataclass defaults
+#
+# Notes:
+#   - Architecture params inherited from base_unet_swin_unet; override here if needed
+#   - Automatically adapts to dataset input_size via Hydra interpolation
+#
+# Usage:
+#   torchrun --module src.train -m model=mdvisco_approximation trainer=approximation_trainer_mdvisco train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_unet_swin_unet
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+# Model input length - dynamically adapts to dataset
+input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}  # Dynamically adapts to dataset with fallback (UCI: 1024, PulseDB: 1280, MIMIC: 4000)

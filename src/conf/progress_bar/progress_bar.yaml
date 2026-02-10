@@ -1,6 +1,45 @@
-# src/conf/progress_bar/progress_bar.yaml
+# ============================================================================
+# Progress Bar Configuration
+# ============================================================================
+#
+# Purpose:
+#   Progress bar configuration with integrated WandB and CSV logging defaults.
+#   Provides real-time progress display, metrics logging, and run-level state
+#   management for training and evaluation workflows.
+#
+# Inherits:
+#   - base_progress_bar: Base progress bar configuration with default intervals
+#   - wandb_wrapper: WandB logging wrapper configuration
+#   - csv_wrapper: CSV logging wrapper configuration
+#
+# Notes:
+#   - Logging intervals can be overridden via CLI (log_interval, wandb_log_interval, csv_log_interval)
+#   - WandB and CSV wrappers can be disabled or overridden independently
+#   - Progress bar automatically manages step counting and collision prevention
+#
+# ============================================================================
 
 defaults:
   - base_progress_bar
   - /wandb_wrapper@wandb_wrapper: wandb
+  - /csv_wrapper@csv_wrapper: csv
   - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference via Hydra defaults:
+#    In trainer/evaluator configs:
+#      defaults:
+#        - /progress_bar@progress_bar: progress_bar
+#
+# 2. Override logging wrappers:
+#    python -m src.train trainer=approximation_trainer_mdvisco \
+#      progress_bar.wandb_wrapper=null \
+#      progress_bar.csv_wrapper.log_dir=/custom/path
+#
+# 3. Override logging intervals:
+#    python -m src.train trainer=approximation_trainer_mdvisco \
+#      progress_bar.log_interval=10 \
+#      progress_bar.wandb_log_interval=5 \
+#      progress_bar.csv_log_interval=1
+# ============================================================================

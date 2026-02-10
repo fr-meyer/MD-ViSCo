@@ -1,0 +1,74 @@
+# ============================================================================
+# MD-ViSCo Refinement Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for MD-ViSCo refinement (second-stage) training.
+#   Fine-tunes MD-ViSCo model to predict blood pressure scalars from
+#   multi-source inputs (PPG, ECG) with demographics using multi-WCL loss.
+#
+# Inherits:
+#   - base_refinement_scalar: Base scalar refinement trainer configuration
+#   - model: mdvisco_refinement (MD-ViSCo refinement model)
+#   - directions: ppg2bp_ecg2bp (multi-source BP prediction)
+#   - demographics_text_encoder: Demographics text encoding preprocessor
+#
+# Notes:
+#   - Trainer name: MDViSCoRef
+#   - Number of epochs: 60
+#   - Uses demographics (age, gender, height, weight, BMI) as additional inputs
+#   - Supports multi-source inputs: PPG and ECG signals
+#   - Target: BP scalars with global_minmax normalization
+#
+# ============================================================================
+
+defaults:
+  - base_refinement_scalar
+  - /model@model: mdvisco_refinement
+  - /directions@directions: ppg2bp_ecg2bp
+  - /input_preprocessor@demographics_text_encoder: demographics_text_encoder
+  - _self_
+
+trainer_name: MDViSCoRef
+
+num_epochs: 60
+
+input_preprocessing:
+  source:
+    - vital: "ppg"
+      norm: "minmax_zc"
+    - vital: "ecg"
+      norm: "minmax_zc"
+  target:
+    - vital: "bp"
+      norm: "global_minmax"
+  include:
+    - bp_raw
+    - age_raw
+    - gender_raw
+    - height_raw
+    - weight_raw
+    - bmi_raw
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=refinement_trainer_mdvisco \
+#      train_dataset=train_uci_refinement_bp \
+#      checkpoint_managers.load.base_dir=/path/to/approximation/checkpoints
+#
+# 2. Override direction:
+#    python -m src.train trainer=refinement_trainer_mdvisco \
+#      directions=ppg2abp
+#
+# 3. Override training parameters:
+#    python -m src.train trainer=refinement_trainer_mdvisco \
+#      num_epochs=100 \
+#      batch_size=64 \
+#      learning_rate=1e-4
+#
+# 4. Override checkpoint loading:
+#    python -m src.train trainer=refinement_trainer_mdvisco \
+#      checkpoint_managers.load.base_dir=/custom/path \
+#      checkpoint_managers.load.trainer_name=WaveRecApp
+# ============================================================================

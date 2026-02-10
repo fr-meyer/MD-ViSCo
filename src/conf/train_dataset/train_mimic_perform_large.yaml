@@ -1,0 +1,60 @@
+# ============================================================================
+# MimicPERFormLarge Training Dataset Configuration
+# ============================================================================
+#
+# Purpose:
+#   Training dataset configuration for MimicPERFormLarge. Inherits base MimicPERFormLarge
+#   settings and defines training-specific preprocessing and data loading parameters.
+#
+# Inherits:
+#   - base_mimicperformlarge: Base MimicPERFormLarge dataset configuration
+#
+# Notes:
+#   - BP normalization: dbp_min and sbp_max define the dataset's BP value ranges used for
+#     denormalization during inference. These values are automatically sourced from the base
+#     dataset config (base_mimicperformlarge) and used by processors to convert normalized predictions back
+#     to mmHg. MIMIC: Placeholder values (dataset used for RR prediction, not BP prediction)
+#   - Default split: 80% train, 20% validation, 0% test
+#
+# ============================================================================
+
+defaults:
+  - base_mimicperformlarge
+  - _self_
+
+input_preprocessing:
+  source:
+    - vital: "ecg"
+      norm: "raw"
+    - vital: "ppg"
+      norm: "raw"
+    - vital: "imp"
+      norm: "raw"
+  target:
+    - vital: "ppg"
+      norm: "raw"
+
+input_size: 4000
+
+dataset_path: ???
+file_name: 'MimicPERFormLarge_train.h5'
+train_ratio: 0.80
+val_ratio: 0.20
+test_ratio: 0.0
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - train_dataset: train_mimic_perform_large
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      train_dataset=train_mimic_perform_large \
+#      train_dataset.dataset_path=/path/to/mimic/data
+#
+# 3. Override preprocessing or split ratios:
+#    python src/train.py train_dataset=train_mimic_perform_large \
+#      train_dataset.train_ratio=0.75 \
+#      train_dataset.val_ratio=0.25
+# ============================================================================

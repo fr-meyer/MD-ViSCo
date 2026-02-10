@@ -1,0 +1,43 @@
+# ============================================================================
+# ECG Feature Extractor Configuration
+# ============================================================================
+#
+# Purpose:
+#   Extracts R-peaks, QT intervals, and ECG quality from ECG waveforms.
+#   Used for ECG waveform reconstruction tasks that also extract clinical features
+#   (e.g., PPG→ECG models that need R-peak detection and QT interval analysis).
+#
+# Inherits:
+#   - base_ecg_feature_extractor: Base ECG feature extractor configuration
+#     (from src/processors/extractors.py)
+#
+# Notes:
+#   - Clinical context: R-peaks for heart rate and HRV; QT interval for arrhythmia
+#     risk (prolonged QT > 0.44s male, > 0.46s female); signal quality for gating
+#     noisy segments; filter band 0.5–3 Hz for cardiac cycles
+#   - Used by waveform_processor_ecg_features processor
+#   - Output structure includes peak_locations (R/P/T/Q/S wave fiducials),
+#     qt_intervals, and mean_ecg_quality scores
+#
+# ============================================================================
+
+defaults:
+  - base_ecg_feature_extractor
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in processor configs via Hydra defaults:
+#    defaults:
+#      - /extractor@extractor: ecg_feature_extractor
+#    (e.g., waveform_processor_ecg_features)
+#
+# 2. Override extractor parameters via CLI:
+#    python src/train.py processor=waveform_processor_ecg_features \
+#      processor.extractor.sampling_rate=500
+#    python src/train.py processor=waveform_processor_ecg_features \
+#      processor.extractor.strict_mode=false
+#
+# 3. Reference:
+#    Parameters and output schema: see src.processors.extractors.ECGFeatureExtractor
+# ============================================================================

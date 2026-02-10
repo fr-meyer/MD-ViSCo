@@ -1,0 +1,48 @@
+# ============================================================================
+# PulseDB Preprocessing Configuration
+# ============================================================================
+#
+# Purpose:
+#   Convenient wrapper configuration for PulseDB dataset preprocessing. Composes
+#   base_pulsedb_preprocessing and provides common overrides for preprocessing
+#   PulseDB dataset files (.mat format) into HDF5 format suitable for training.
+#
+# Inherits:
+#   - base_pulsedb_preprocessing: Base PulseDB preprocessing configuration from ConfigStore
+#
+# Notes:
+#   - Input and output file paths are required and must be provided via CLI
+#   - Demographic Storage Format: Demographics are saved as 5 separate HDF5 datasets:
+#     * age: [N] - Age values
+#     * gender: [N] - Gender values (0/1 binary encoding)
+#     * height: [N] - Height values
+#     * weight: [N] - Weight values
+#     * bmi: [N] - BMI values
+#   - These individual fields are loaded by the dataset and used throughout the pipeline
+#
+# ============================================================================
+
+defaults:
+  - base_pulsedb_preprocessing
+  - _self_
+
+# Common field overrides for runtime configuration
+input_file: ???  # Path to input .mat file (required)
+output_file: ???  # Path to output directory or file (required)
+
+# Usage Examples
+# ============================================================================
+# 1. Basic preprocessing:
+#    python -m src.script.preprocess.preprocess \
+#      preprocessor=pulsedb_preprocessing \
+#      preprocessor.input_file=/path/to/input.mat \
+#      preprocessor.output_file=/path/to/output.h5
+#
+# 2. Override additional preprocessing parameters:
+#    python -m src.script.preprocess.preprocess \
+#      preprocessor=pulsedb_preprocessing \
+#      preprocessor.input_file=/path/to/input.mat \
+#      preprocessor.output_file=/path/to/output.h5 \
+#      preprocessor.save_files=true
+# ============================================================================
+
