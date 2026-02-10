@@ -1,0 +1,35 @@
+# ============================================================================
+# CSV Wrapper Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for CSV logging wrapper. Composes base_csv_wrapper
+#   from the Hydra ConfigStore to provide CSV file logging parameters for
+#   recording training metrics and evaluation results.
+#
+# Inherits:
+#   - base_csv_wrapper: Base CSV wrapper configuration from ConfigStore
+#     (defined in CSVWrapperConfig)
+#
+# Notes:
+#   - Used for logging metrics to CSV files during training and evaluation
+#   - Can be configured with filename templates and output directories
+#
+# ============================================================================
+
+defaults:
+  - base_csv_wrapper
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer/evaluator configs via Hydra defaults:
+#    defaults:
+#      - csv_wrapper: csv
+#
+# 2. Override CSV output settings:
+#    python src/train.py trainer.progress_bar.csv_wrapper.filename_template=custom_{seed}.csv
+#
+# 3. Enable CSV logging in evaluator:
+#    python -m src.test evaluator.progress_bar.csv_wrapper.filename_template=results.csv
+# ============================================================================

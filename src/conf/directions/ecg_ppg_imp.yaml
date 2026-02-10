@@ -1,0 +1,43 @@
+# ============================================================================
+# ECG-PPG-IMP Multi-Direction Configuration
+# ============================================================================
+#
+# Purpose:
+#   Comprehensive multi-direction configuration for ECG, PPG, and IMP
+#   (Impedance) waveform transformations. Defines all possible direction
+#   mappings between these three signal types, enabling models to learn
+#   transformations across all combinations.
+#
+# Inherits:
+#   - base_directions: Base direction configuration from ConfigStore
+#
+# Notes:
+#   - Multi-direction configuration: All combinations of PPG, ECG, and IMP
+#   - Includes: PPG→ECG, PPG→IMP, ECG→PPG, ECG→IMP, IMP→PPG, IMP→ECG
+#   - Used for comprehensive multi-direction training with impedance signals
+#
+# ============================================================================
+
+defaults:
+  - base_directions
+  - _self_
+
+active_directions:
+  - _target_: src.core.domain.Direction
+    source: [PPG]
+    target: ECG
+  - _target_: src.core.domain.Direction
+    source: [PPG]
+    target: IMP
+  - _target_: src.core.domain.Direction
+    source: [ECG]
+    target: PPG
+  - _target_: src.core.domain.Direction
+    source: [ECG]
+    target: IMP
+  - _target_: src.core.domain.Direction
+    source: [IMP]
+    target: PPG
+  - _target_: src.core.domain.Direction
+    source: [IMP]
+    target: ECG

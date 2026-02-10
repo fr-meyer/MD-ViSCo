@@ -1,0 +1,52 @@
+# ============================================================================
+# Waveform Processor PPG Features Configuration
+# ============================================================================
+#
+# Purpose:
+#   WaveformOutputProcessor with PPG feature extraction. Used for PPG waveform
+#   reconstruction tasks that also extract vascular features (e.g., ECG→PPG
+#   models that need arterial stiffness and compliance markers).
+#   Processes continuous waveform predictions and extracts Asp_deltaT and IPR
+#   (arterial stiffness markers).
+#
+# Inherits:
+#   - base_waveform_processor: Base waveform processor configuration
+#     (WaveformProcessorConfig)
+#   - ppg_feature_extractor: PPG feature extractor for Asp_deltaT and IPR
+#
+# Notes:
+#   - Unified processor interface (process()) handles all stages:
+#     * stage="train": minimal parsing, no trimming unless trainer requests full metrics
+#     * stage="val"/"test": full trimming, scalar extraction, optional metrics
+#   - Output structure includes:
+#     * waveform: Reconstructed PPG waveform [B, C, T]
+#     * Asp_deltaT: Array of onset-to-peak times per sample
+#     * IPR: Array of inflection point ratios per sample
+#
+# ============================================================================
+
+defaults:
+  - base_waveform_processor
+  - /extractor@extractor: ppg_feature_extractor
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /processor@processor: waveform_processor_ppg_features
+#
+# 2. Override extractor parameters via CLI:
+#    python src/train.py processor=waveform_processor_ppg_features \
+#      processor.extractor.sampling_rate=100 \
+#      processor.extractor.fL=0.7 \
+#      processor.extractor.fH=15.0
+#
+# 3. Adjust smoothing for noisy signals:
+#    python src/train.py processor=waveform_processor_ppg_features \
+#      processor.extractor.sm_wins.ppg=70 \
+#      processor.extractor.sm_wins.vpg=15
+#
+# 4. Enable metrics for evaluation:
+#    python src/train.py processor=waveform_processor_ppg_features \
+#      processor.compute_metrics=true
+# ============================================================================

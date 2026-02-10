@@ -1,0 +1,36 @@
+# ============================================================================
+# Adam Optimizer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for Adam optimizer settings. Composes base_adam
+#   from the Hydra ConfigStore to provide Adam optimizer parameters for model
+#   training.
+#
+# Inherits:
+#   - base_adam: Base Adam optimizer configuration from ConfigStore
+#
+# Notes:
+#   - Standard adaptive learning rate optimizer suitable for most deep learning tasks
+#   - Parameters (learning rate, betas, weight decay) are defined in base_adam
+#
+# ============================================================================
+
+defaults:
+  - base_adam
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /optimizer@optimizer: adam
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      optimizer=adam \
+#      optimizer.lr=0.001
+#
+# 3. Override specific parameters:
+#    python src/train.py optimizer=adam optimizer.lr=0.0001 optimizer.weight_decay=1e-5
+# ============================================================================

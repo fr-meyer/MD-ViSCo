@@ -1,0 +1,66 @@
+# ============================================================================
+# Base Refinement Scalar Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Base configuration for scalar refinement (second-stage) training workflows.
+#   Fine-tunes models to predict scalar values (e.g., blood pressure) from
+#   waveforms using multi-weighted contrastive loss (WCL) for improved accuracy.
+#
+# Inherits:
+#   - base_scalar_regression_trainer: Base scalar regression trainer
+#   - criterion: regression_multi_wcl (multi-weighted contrastive loss)
+#   - optimizer: adam (Adam optimizer)
+#   - scheduler: reduce_lr_on_plateau (learning rate reduction on plateau)
+#   - checkpoint_manager: Checkpoint saving configuration
+#   - checkpoint_io: Checkpoint I/O configuration
+#   - progress_bar: Progress bar and logging configuration
+#   - early_stopping: Early stopping configuration
+#   - processor: scalar_processor (scalar output processing)
+#   - directions: ppg2abp (default direction, can be overridden)
+#
+# Notes:
+#   - Used as base for scalar refinement trainers (e.g., nabnetbp)
+#   - Trainer name: WaveRecRef (Waveform Reconstruction Refinement)
+#   - is_finetuning: true (enables fine-tuning from approximation checkpoints)
+#   - Multi-WCL loss improves scalar prediction accuracy
+#
+# ============================================================================
+
+defaults:
+  - base_scalar_regression_trainer
+  - /criterion@criterion: regression_multi_wcl
+  - /optimizer@optimizer: adam
+  - /scheduler@scheduler: reduce_lr_on_plateau
+  - /checkpoint_manager@checkpoint_managers.save: checkpoint_manager
+  - /checkpoint_manager@checkpoint_managers.load: checkpoint_manager
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - /progress_bar@progress_bar: progress_bar
+  - /early_stopping@early_stopping: early_stopping
+  - /processor@processor: scalar_processor
+  - /directions@directions: ppg2abp
+  - _self_
+
+trainer_name: WaveRecRef
+is_finetuning: true
+
+# Usage Examples
+# ============================================================================
+# 1. Use as base for scalar refinement trainers:
+#    defaults:
+#      - base_refinement_scalar
+#      - /model@model: nabnet_refinement
+#
+# 2. Override direction:
+#    python -m src.train trainer=refinement_trainer_nabnetbp \
+#      directions=ecg2abp
+#
+# 3. Override checkpoint loading:
+#    python -m src.train trainer=refinement_trainer_nabnetbp \
+#      checkpoint_managers.load.base_dir=/path/to/approximation/checkpoints
+#
+# 4. Override loss or optimizer:
+#    python -m src.train trainer=refinement_trainer_nabnetbp \
+#      criterion=multi_regression_loss \
+#      optimizer=sgd
+# ============================================================================

@@ -1,8 +1,27 @@
+# ============================================================================
+# ABP to PPG Direction Configuration
+# ============================================================================
+#
+# Purpose:
+#   Direction configuration for ABP (Arterial Blood Pressure) to PPG
+#   (Photoplethysmography) waveform transformation. Defines a single-direction
+#   mapping from ABP source signals to PPG target waveforms for model training
+#   and inference.
+#
+# Inherits:
+#   - base_directions: Base direction configuration from ConfigStore
+#
+# Notes:
+#   - Single-source direction: ABP → PPG
+#   - Used for waveform reconstruction tasks
+#
+# ============================================================================
+
 defaults:
   - base_directions
   - _self_
 
 active_directions:
   - _target_: src.core.domain.Direction
-    src: ABP
-    tgt: PPG
+    source: [ABP]
+    target: PPG

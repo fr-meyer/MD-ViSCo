@@ -1,0 +1,56 @@
+# ============================================================================
+# WaveNet Approximation Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for WaveNet approximation (first-stage) training.
+#   Trains WaveNet model to generate initial waveform approximations from
+#   source signals using deep supervision loss.
+#
+# Inherits:
+#   - base_approximation_trainer: Base approximation trainer configuration
+#   - model: wavenet (WaveNet model)
+#
+# Notes:
+#   - Number of epochs: 150 (longer training for WaveNet)
+#   - Scheduler patience: 6 epochs
+#   - Batch size: 32 (optimized for WaveNet architecture)
+#   - Early stopping patience: 12 epochs
+#
+# ============================================================================
+
+defaults:
+  - base_approximation_trainer
+  - /model@model: wavenet
+  - _self_
+num_epochs: 150
+
+scheduler:
+  patience: 6
+
+batch_size: 32
+
+early_stopping:
+  patience: 12
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=approximation_trainer_wavenet \
+#      train_dataset=train_uci
+#
+# 2. Override direction:
+#    python -m src.train trainer=approximation_trainer_wavenet \
+#      directions=ecg2abp
+#
+# 3. Override training parameters:
+#    python -m src.train trainer=approximation_trainer_wavenet \
+#      num_epochs=200 \
+#      batch_size=64 \
+#      early_stopping.patience=20
+#
+# 4. Override model parameters:
+#    python -m src.train trainer=approximation_trainer_wavenet \
+#      model.n_residue=64 \
+#      model.n_skip=256
+# ============================================================================

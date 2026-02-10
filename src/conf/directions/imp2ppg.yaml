@@ -1,0 +1,26 @@
+# ============================================================================
+# IMP to PPG Direction Configuration
+# ============================================================================
+#
+# Purpose:
+#   Direction configuration for IMP (Impedance) to PPG (Photoplethysmography)
+#   waveform transformation. Defines a single-direction mapping from IMP source
+#   signals to PPG target waveforms for model training and inference.
+#
+# Inherits:
+#   - base_directions: Base direction configuration from ConfigStore
+#
+# Notes:
+#   - Single-source direction: IMP → PPG
+#   - Used for waveform reconstruction tasks with impedance signals
+#
+# ============================================================================
+
+defaults:
+  - base_directions
+  - _self_
+
+active_directions:
+  - _target_: src.core.domain.Direction
+    source: [IMP]
+    target: PPG

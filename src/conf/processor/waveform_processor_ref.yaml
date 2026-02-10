@@ -1,0 +1,43 @@
+# ============================================================================
+# Waveform Processor Reference Configuration
+# ============================================================================
+#
+# Purpose:
+#   WaveformOutputProcessor configuration for training runs without metric overhead.
+#   Adds BP extractor for BP scalar extraction from ABP waveforms.
+#   Processes continuous waveform predictions (PPG→ABP, ECG→ABP, etc.) and
+#   extracts systolic and diastolic blood pressure values.
+#
+# Inherits:
+#   - base_waveform_processor: Base waveform processor configuration
+#     (WaveformProcessorConfig)
+#   - bp_extractor: BP extractor for SBP/DBP extraction
+#
+# Notes:
+#   - Unified processor interface (process()) handles all stages:
+#     * stage="train": minimal parsing, no trimming unless trainer requests full metrics
+#     * stage="val"/"test": full trimming, scalar extraction, optional metrics
+#   - Extends waveform_processor with BP extraction capability
+#   - Used when BP scalar values are needed alongside waveform predictions
+#
+# ============================================================================
+
+defaults:
+  - base_waveform_processor
+  - /extractor@extractor: bp_extractor
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /processor@processor: waveform_processor_ref
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      processor=waveform_processor_ref
+#
+# 3. Override extractor parameters:
+#    python src/train.py processor=waveform_processor_ref \
+#      processor.extractor.min_name=diastolic \
+#      processor.extractor.max_name=systolic
+# ============================================================================

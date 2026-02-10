@@ -1,0 +1,63 @@
+# ============================================================================
+# Base UCI Dataset Configuration
+# ============================================================================
+#
+# Purpose:
+#   Base configuration providing default values for UCI dataset configs.
+#   Defines dataset-specific parameters including BP value ranges, input size,
+#   and splitting strategies.
+#
+# Base:
+#   - _target_: src.dataset.uci_dataset.UCIConfig
+#
+# Notes:
+#   - UCI BP range: DBP 50.0 mmHg, SBP up to 189.98 mmHg
+#   - Input size: 1024 samples (controls automatic padding/trimming)
+#   - Default split: 80% train, 20% validation, 0% test
+#
+# ============================================================================
+
+_target_: src.dataset.uci_dataset.UCIConfig
+dataset_name: UCI
+
+# Input size for models (controls automatic padding/trimming)
+input_size: 1024
+
+# UCI BP value ranges (for BP denormalization)
+# UCI: DBP range 50.0 mmHg, SBP range up to 189.98 mmHg
+dbp_min: 50.0
+sbp_max: 189.98421357007769
+
+# File path structure
+dataset_folder: UCI_Dataset_Preprocessed/mdvisco_processed/UCI
+
+# Dataset splitting configuration
+# All ratios must be between 0.0 and 1.0, and must sum to 1.0
+train_ratio: 0.80
+val_ratio: 0.20
+test_ratio: 0.0
+
+# Splitting strategy flags
+use_patient_split: false
+use_nabnet_vanilla_split: false
+
+# Trimming strategy (only used when trimming is needed)
+trim_strategy: center
+
+# Usage Examples
+# ============================================================================
+# 1. Inherit in dataset configs via Hydra defaults:
+#    defaults:
+#      - base_uci
+#      - _self_
+#
+# 2. Override specific parameters:
+#    python src/train.py train_dataset=train_uci \
+#      train_dataset.train_ratio=0.75 \
+#      train_dataset.val_ratio=0.25
+#
+# 3. Override BP bounds (if needed):
+#    python src/train.py train_dataset=train_uci \
+#      train_dataset.dbp_min=40.0 \
+#      train_dataset.sbp_max=200.0
+# ============================================================================

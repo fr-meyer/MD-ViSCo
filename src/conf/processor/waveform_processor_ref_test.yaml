@@ -1,0 +1,54 @@
+# ============================================================================
+# WaveformOutputProcessor with BP extractor for evaluation/training
+# ============================================================================
+#
+# Purpose:
+#   Waveform BP processor with dataset-adaptive denormalization bounds.
+#   Supports both training (train_dataset present) and evaluation-only
+#   (test_dataset only) flows via oc.select fallback.
+#
+# Variable Interpolation Mechanism (oc.select):
+#   The oc.select resolver enables fallback behavior: it first tries to read
+#   train_dataset.dbp_min/sbp_max, and if train_dataset is not available (e.g., during
+#   evaluation-only runs), it falls back to test_dataset.dbp_min/sbp_max. This allows
+#   the same processor config to work for both training (with train_dataset) and
+#   evaluation-only scenarios (with only test_dataset loaded).
+#
+# Compatibility:
+#   - approximation_trainer_mdvisco, refinement_trainer_mdvisco (waveform BP)
+#   - blood_pressure_evaluator, scaling_two_stage_*_evaluator evaluators
+# ============================================================================
+
+defaults:
+  - base_waveform_processor
+  - /extractor@extractor: bp_extractor
+
+compute_metrics: true
+denormalize: true
+
+# Prefer train_dataset; fall back to test_dataset when only test is loaded (e.g. evaluation)
+global_min: ${oc.select:train_dataset.dbp_min,${test_dataset.dbp_min}}
+global_max: ${oc.select:train_dataset.sbp_max,${test_dataset.sbp_max}}
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer/evaluator configs via Hydra defaults:
+#    defaults:
+#      - /processor@processor: waveform_processor_ref_test
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_mdvisco \
+#      processor=waveform_processor_ref_test
+#
+# 3. Override global_min and global_max:
+#    python src/train.py processor=waveform_processor_ref_test \
+#      processor.global_min=40.0 \
+#      processor.global_max=200.0
+#
+# 4. oc.select fallback behavior example:
+#    When train_dataset is not available (e.g., evaluation-only runs),
+#    oc.select automatically falls back to test_dataset values:
+#    - With train_dataset: uses train_dataset.dbp_min/sbp_max
+#    - Without train_dataset: uses test_dataset.dbp_min/sbp_max
+#    This allows the same config to work for both training and evaluation flows.
+# ============================================================================

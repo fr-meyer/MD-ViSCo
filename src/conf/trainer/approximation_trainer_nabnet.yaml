@@ -1,0 +1,51 @@
+# ============================================================================
+# NABNet Approximation Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for NABNet approximation (first-stage) training.
+#   Trains NABNet model to generate initial waveform approximations from
+#   source signals using deep supervision loss.
+#
+# Inherits:
+#   - base_approximation_trainer: Base approximation trainer configuration
+#   - model: nabnet_approximation (NABNet approximation model)
+#
+# Notes:
+#   - Scheduler disabled (scheduler: null) for fixed learning rate
+#   - Batch size: 32 (optimized for NABNet architecture)
+#   - Early stopping patience: 20 epochs
+#
+# ============================================================================
+
+defaults:
+  - base_approximation_trainer
+  - /model@model: nabnet_approximation
+  - _self_
+scheduler: null
+
+batch_size: 32
+
+early_stopping:
+  patience: 20
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=approximation_trainer_nabnet \
+#      train_dataset=train_uci
+#
+# 2. Override direction:
+#    python -m src.train trainer=approximation_trainer_nabnet \
+#      directions=ecg2abp
+#
+# 3. Override batch size or early stopping:
+#    python -m src.train trainer=approximation_trainer_nabnet \
+#      batch_size=64 \
+#      early_stopping.patience=30
+#
+# 4. Enable scheduler:
+#    python -m src.train trainer=approximation_trainer_nabnet \
+#      scheduler=reduce_lr_on_plateau \
+#      scheduler.patience=5
+# ============================================================================

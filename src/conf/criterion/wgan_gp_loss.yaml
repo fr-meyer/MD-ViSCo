@@ -1,6 +1,45 @@
+# ============================================================================
+# WGAN-GP Loss Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for WGAN-GP (Wasserstein GAN with Gradient Penalty)
+#   loss. Composes base WGAN-GP components from the Hydra ConfigStore to provide
+#   adversarial training loss parameters for GAN-based model training.
+#
+# Inherits:
+#   - base_wgan_gp_loss: Base WGAN-GP loss configuration from ConfigStore
+#   - /criterion@adv_config: base_wgan_adversarial_loss: Adversarial loss component
+#   - /criterion@mse_config: base_mse_loss: MSE loss component
+#   - /criterion@gp_config: base_wgan_gradient_penalty: Gradient penalty component
+#
+# Notes:
+#   - Combines adversarial loss, MSE reconstruction loss, and gradient penalty
+#   - Used for training GAN-based models like P2E-WGAN
+#   - Gradient penalty helps stabilize training compared to weight clipping
+#
+# ============================================================================
+
 defaults:
   - base_wgan_gp_loss
   - /criterion@adv_config: base_wgan_adversarial_loss
   - /criterion@mse_config: base_mse_loss
   - /criterion@gp_config: base_wgan_gradient_penalty
   - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /criterion@criterion: wgan_gp_loss
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_gan \
+#      criterion=wgan_gp_loss
+#
+# 3. Override component weights if needed:
+#    python src/train.py criterion=wgan_gp_loss \
+#      criterion.adv_weight=1.0 \
+#      criterion.mse_weight=10.0 \
+#      criterion.gp_weight=10.0
+# ============================================================================

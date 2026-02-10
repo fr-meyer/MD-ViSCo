@@ -1,0 +1,64 @@
+# ============================================================================
+# Consolidated Scalar Processor Configuration for BP Prediction Tasks
+# ============================================================================
+#
+# Purpose:
+#   Unified scalar processor supporting UCI and PulseDB datasets via variable
+#   interpolation. Automatically sources BP denormalization bounds from the
+#   active dataset configuration (train or test), eliminating the need for
+#   dataset-specific processor configs.
+#
+# Dataset Support:
+#   - UCI: BP range 50.0-189.98 mmHg
+#     (dbp_min=50.0, sbp_max=189.98421357007769)
+#   - PulseDB: BP range 2.34-286.58 mmHg
+#     (dbp_min=2.341260731456743, sbp_max=286.58240014784946)
+#
+# Variable Interpolation Mechanism (oc.select):
+#   The oc.select resolver enables fallback behavior: it first tries to read
+#   train_dataset.dbp_min/sbp_max, and if train_dataset is not available (e.g., during
+#   evaluation-only runs), it falls back to test_dataset.dbp_min/sbp_max. This allows
+#   the same processor config to work for both training (with train_dataset) and
+#   evaluation-only scenarios (with only test_dataset loaded).
+#
+# Compatibility:
+#   Works with refinement_trainer_nabnet, refinement_trainer_patchtst,
+#   refinement_trainer_nabnetbp, refinement_trainer_mdvisco, and
+#   evaluators that use scalar BP models.
+#
+# ============================================================================
+
+defaults:
+  - base_scalar_processor
+
+# BP-specific overrides
+output_keys: ['sbp','dbp']
+compute_metrics: true
+denormalize: true
+
+# Prefer train_dataset; fall back to test_dataset when only test is loaded (e.g. evaluation)
+global_min: ${oc.select:train_dataset.dbp_min,${test_dataset.dbp_min}}
+global_max: ${oc.select:train_dataset.sbp_max,${test_dataset.sbp_max}}
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /processor@processor: scalar_processor
+#
+# 2. Command line override:
+#    python src/train.py trainer=refinement_trainer_nabnet \
+#      train_dataset=train_uci \
+#      processor=scalar_processor
+#
+# 3. Evaluation-only (test_dataset only):
+#    python -m src.test evaluator=... test_dataset=test_uci
+#    Bounds resolve from test_dataset.dbp_min and test_dataset.sbp_max
+# ============================================================================
+
+# Edge Cases and Limitations
+# ============================================================================
+# - At least one of train_dataset or test_dataset must be in config with dbp_min/sbp_max
+# - Dataset configs must define dbp_min and sbp_max (DatasetBaseConfig enforces these)
+# - Source: src/processors/scalar_processor.py, src/processors/metrics_utils.py
+# ============================================================================

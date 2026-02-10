@@ -1,0 +1,64 @@
+# ============================================================================
+# UCI Test Dataset Configuration for Waveform ABP Reconstruction
+# ============================================================================
+#
+# Purpose:
+#   Test dataset configuration for UCI waveform ABP reconstruction (target: ABP only).
+#   Inherits base UCI settings and defines test-specific preprocessing and
+#   data loading parameters for waveform reconstruction evaluators.
+#
+# Inherits:
+#   - base_uci: Base UCI dataset configuration
+#
+# Notes:
+#   - For BP normalization bounds documentation, see README.md in this directory
+#   - Target: ABP waveform only (for waveform reconstruction trainers like WaveNet, PPG2ABP)
+#   - Default split: 0% train, 0% validation, 100% test
+#
+# ============================================================================
+
+defaults:
+  - base_uci
+  - _self_
+
+# Canonical channel layout derived from preprocessing-driven mapping
+# Target: ABP waveform only (for waveform reconstruction trainers like WaveNet, PPG2ABP)
+input_preprocessing:
+  source:
+    - vital: "ecg"
+      norm: "minmax_zc"
+    - vital: "ppg"
+      norm: "minmax_zc"
+    - vital: "abp"
+      norm: "minmax_zc"
+  target:
+    - vital: "abp"
+      norm: "global_minmax"
+  include:
+    - bp_raw
+
+# The actual configuration values will be loaded from UCIConfig defaults
+# You can override any values here if needed
+
+dataset_path: ???  # Must be provided via CLI or environment variable
+file_name: 'test.h5'
+train_ratio: 0.0
+val_ratio: 0.0
+test_ratio: 1.0
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in test/evaluator configs via Hydra defaults:
+#    defaults:
+#      - test_dataset: test_uci_refinement_abp
+#
+# 2. Command line override:
+#    python -m src.test evaluator=blood_pressure_evaluator \
+#      test_dataset=test_uci_refinement_abp \
+#      test_dataset.dataset_path=/path/to/uci/data
+#
+# 3. Override preprocessing if needed:
+#    python -m src.test test_dataset=test_uci_refinement_abp \
+#      test_dataset.input_preprocessing.source[0].norm=standardize
+# ============================================================================
+

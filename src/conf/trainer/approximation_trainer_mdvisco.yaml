@@ -1,0 +1,64 @@
+# ============================================================================
+# MD-ViSCo Approximation Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for MD-ViSCo approximation (first-stage) training.
+#   Trains MD-ViSCo model to generate initial waveform approximations from
+#   multi-source inputs (PPG, ECG, ABP) using deep supervision loss.
+#
+# Inherits:
+#   - base_approximation_trainer: Base approximation trainer configuration
+#   - model: mdvisco_approximation (MD-ViSCo approximation model)
+#   - processor: waveform_processor_ref_test (waveform processing for testing)
+#
+# Notes:
+#   - Supports multi-source inputs: PPG, ECG, and ABP signals
+#   - Uses minmax_zc normalization for all vitals
+#   - Processor configured for reference testing workflow
+#
+# ============================================================================
+
+defaults:
+  - base_approximation_trainer
+  - /model@model: mdvisco_approximation
+  - /processor@processor: waveform_processor_ref_test
+  - _self_
+
+input_preprocessing:
+  source:
+    - vital: "ppg"
+      norm: "minmax_zc"
+    - vital: "ecg"
+      norm: "minmax_zc"
+    - vital: "abp"
+      norm: "minmax_zc"
+  target:
+    - vital: "ppg"
+      norm: "minmax_zc"
+    - vital: "ecg"
+      norm: "minmax_zc"
+    - vital: "abp"
+      norm: "minmax_zc"
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=approximation_trainer_mdvisco \
+#      train_dataset=train_uci
+#
+# 2. Override direction:
+#    python -m src.train trainer=approximation_trainer_mdvisco \
+#      directions=ecg_ppg_abp
+#
+# 3. Override model parameters:
+#    python -m src.train trainer=approximation_trainer_mdvisco \
+#      model.init_features=128 \
+#      model.patch_size=8
+#
+# 4. Override training parameters:
+#    python -m src.train trainer=approximation_trainer_mdvisco \
+#      batch_size=64 \
+#      learning_rate=1e-3 \
+#      num_epochs=100
+# ============================================================================

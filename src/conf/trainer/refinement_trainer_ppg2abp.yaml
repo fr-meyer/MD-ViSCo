@@ -1,0 +1,55 @@
+# ============================================================================
+# PPG2ABP Refinement Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for PPG2ABP refinement (second-stage) training.
+#   Fine-tunes PPG2ABP cascade model to improve ABP waveform quality from
+#   PPG signals using deep supervision loss.
+#
+# Inherits:
+#   - base_refinement_waveform: Base waveform refinement trainer configuration
+#   - model: ppg2abp_cascade (PPG2ABP cascade model)
+#   - criterion: deep_supervision_loss (multi-scale loss for refinement)
+#
+# Notes:
+#   - Scheduler disabled (scheduler: null) for fixed learning rate
+#   - Early stopping patience: 20 epochs
+#   - Uses cascade architecture for improved waveform quality
+#   - Fine-tunes from approximation checkpoints
+#
+# ============================================================================
+
+defaults:
+  - base_refinement_waveform
+  - /model@model: ppg2abp_cascade
+  - /criterion@criterion: deep_supervision_loss
+  - _self_
+
+scheduler: null
+
+early_stopping:
+  patience: 20
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=refinement_trainer_ppg2abp \
+#      train_dataset=train_uci_refinement_abp \
+#      checkpoint_managers.load.base_dir=/path/to/approximation/checkpoints
+#
+# 2. Override direction:
+#    python -m src.train trainer=refinement_trainer_ppg2abp \
+#      directions=ecg2abp
+#
+# 3. Override training parameters:
+#    python -m src.train trainer=refinement_trainer_ppg2abp \
+#      batch_size=64 \
+#      learning_rate=1e-4 \
+#      early_stopping.patience=30
+#
+# 4. Override checkpoint loading:
+#    python -m src.train trainer=refinement_trainer_ppg2abp \
+#      checkpoint_managers.load.base_dir=/custom/path \
+#      checkpoint_managers.load.trainer_name=WaveRecApp
+# ============================================================================

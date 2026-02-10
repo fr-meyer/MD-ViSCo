@@ -1,0 +1,65 @@
+# ============================================================================
+# Base Refinement Waveform Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Base configuration for waveform refinement (second-stage) training workflows.
+#   Fine-tunes models to improve waveform quality from initial approximations
+#   using multi-weighted contrastive loss (WCL) for enhanced reconstruction.
+#
+# Inherits:
+#   - base_waveform_reconstruction_trainer: Base waveform reconstruction trainer
+#   - criterion: regression_multi_wcl (multi-weighted contrastive loss)
+#   - optimizer: adam (Adam optimizer)
+#   - scheduler: reduce_lr_on_plateau (learning rate reduction on plateau)
+#   - checkpoint_manager: Checkpoint saving configuration
+#   - checkpoint_io: Checkpoint I/O configuration
+#   - progress_bar: Progress bar and logging configuration
+#   - early_stopping: Early stopping configuration
+#   - processor: waveform_processor_ref (refinement waveform processing)
+#   - directions: ppg2abp (default direction, can be overridden)
+#
+# Notes:
+#   - Used as base for waveform refinement trainers (MD-ViSCo, NABNet, PatchTST, etc.)
+#   - Trainer name: WaveRecRef (Waveform Reconstruction Refinement)
+#   - is_finetuning: true (enables fine-tuning from approximation checkpoints)
+#   - Multi-WCL loss improves waveform reconstruction quality
+#
+# ============================================================================
+
+defaults:
+  - base_waveform_reconstruction_trainer
+  - /criterion@criterion: regression_multi_wcl
+  - /optimizer@optimizer: adam
+  - /scheduler@scheduler: reduce_lr_on_plateau
+  - /checkpoint_manager@checkpoint_managers.save: checkpoint_manager
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - /progress_bar@progress_bar: progress_bar
+  - /early_stopping@early_stopping: early_stopping
+  - /processor@processor: waveform_processor_ref
+  - /directions@directions: ppg2abp
+  - _self_
+
+trainer_name: WaveRecRef
+is_finetuning: true
+
+# Usage Examples
+# ============================================================================
+# 1. Use as base for waveform refinement trainers:
+#    defaults:
+#      - base_refinement_waveform
+#      - /model@model: mdvisco_refinement
+#
+# 2. Override direction:
+#    python -m src.train trainer=refinement_trainer_mdvisco \
+#      directions=ecg2abp
+#
+# 3. Override checkpoint loading:
+#    python -m src.train trainer=refinement_trainer_mdvisco \
+#      checkpoint_managers.load.base_dir=/path/to/approximation/checkpoints
+#
+# 4. Override loss or optimizer:
+#    python -m src.train trainer=refinement_trainer_mdvisco \
+#      criterion=deep_supervision_loss \
+#      optimizer=sgd
+# ============================================================================

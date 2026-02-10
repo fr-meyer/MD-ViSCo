@@ -1,0 +1,37 @@
+# ============================================================================
+# WaveNet Model – Unified Configuration
+# ============================================================================
+# Paper: WaveNet: A Generative Model for Raw Audio (arXiv:1609.03499) Sec. 2.1–2.4
+# Validation: Validated 2026-01-31
+# Datasets: UCI (1024) | PulseDB (1280) | MIMIC-Perform-Large (4000)
+#
+# Params set here (source):
+#   input_length → dataset (Hydra)
+#   classes=1, output_length=1 → regression overrides (base_wavenet defaults are 256/32 for μ-law)
+#   All architecture params (layers, blocks, dilation_channels, etc.) → base_wavenet dataclass defaults
+#
+# Notes:
+#   - Unified config for both approximation and refinement tasks
+#   - Task determined by trainer and dataset, not model architecture
+#
+# Usage:
+#   torchrun --standalone --nproc_per_node=1 --module src.train -m \
+#     model=wavenet trainer=approximation_trainer_wavenet \
+#     train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_wavenet
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+# Model identification
+model_name: WaveNet
+supports_multi_directional: false
+
+# Input configuration
+input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}  # Dynamically adapts to dataset with fallback (UCI: 1024, PulseDB: 1280, MIMIC: 4000)
+
+# Regression-specific overrides (dataclass defaults are 256/32 for μ-law)
+classes: 1  # Input channel count (matches tensor shape from SingleStageModel.extract_input() which returns [B, C, T] where C=1 for single-source tasks)
+output_length: 1      # Number of samples that are generated for each input

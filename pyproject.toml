@@ -1,0 +1,135 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mdvisco"
+version = "3.0.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.10"
+
+# Ruff configuration - replaces Black, Flake8, and isort
+[tool.ruff]
+# Match Python version requirement
+target-version = "py310"
+line-length = 88
+indent-width = 4
+
+# Exclude directories (consolidated from Black, Flake8, and isort configs)
+exclude = [
+    ".git",
+    ".hg",
+    ".tox",
+    ".venv",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "__pycache__",
+]
+
+# Include .py and .pyi files (matching Black's include pattern)
+include = ["*.py", "*.pyi"]
+
+# Linter configuration
+[tool.ruff.lint]
+# Enable comprehensive rule sets
+# "E" = pycodestyle errors, "W" = pycodestyle warnings, "F" = Pyflakes
+# "I" = isort (import sorting), "N" = pep8-naming, "UP" = pyupgrade
+# "B" = flake8-bugbear, "C4" = flake8-comprehensions, "SIM" = flake8-simplify
+# "TCH" = flake8-type-checking, "TID" = flake8-tidy-imports
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # Pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "SIM",    # flake8-simplify
+    "TCH",    # flake8-type-checking
+    "TID",    # flake8-tidy-imports
+]
+
+# Ignore rules that conflict with formatter or your preferences.
+ignore = [
+]
+
+# Allow fixes for all enabled rules
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Import sorting configuration (replaces isort)
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+known-third-party = [
+    "dotmap",
+    "einops",
+    "h5py",
+    "hydra",
+    "mat73",
+    "neurokit2",
+    "numpy",
+    "omegaconf",
+    "pandas",
+    "pyPPG",
+    "safetensors",
+    "scipy",
+    "sklearn",
+    "timm",
+    "torch",
+    "transformers",
+    "tqdm",
+    "wandb",
+]
+force-single-line = true
+
+# Formatter configuration (replaces Black)
+[tool.ruff.format]
+# Use double quotes like Black
+quote-style = "double"
+# Match Black's indentation
+indent-style = "space"
+# Match Black's line ending style
+line-ending = "auto"
+# Respect magic trailing commas (like Black)
+skip-magic-trailing-comma = false
+
+[tool.pyright]
+# Python version
+pythonVersion = "3.10"
+
+# Type checking mode: "off" | "basic" | "standard" | "strict"
+# "standard" provides a good balance for gradual typing
+typeCheckingMode = "standard"
+
+# Paths configuration
+include = ["src"]
+exclude = [
+    "**/__pycache__",
+    "**/node_modules",
+    ".venv",
+    ".mypy_cache",
+    "build",
+    "dist",
+]
+
+# Ignore tests directory
+ignore = ["tests"]
+
+# Type evaluation settings
+analyzeUnannotatedFunctions = true  # Equivalent to check_untyped_defs = true
+strictParameterNoneValue = true     # Equivalent to no_implicit_optional = true
+
+# Diagnostic settings (mapping from mypy config)
+reportMissingImports = "none"        # Equivalent to ignore_missing_imports = true
+reportMissingParameterType = "none"  # Equivalent to allow_untyped_defs = true
+reportUnknownParameterType = "none"  # Allows untyped parameters
+reportUnknownArgumentType = "none"  # Equivalent to allow_untyped_calls = true
+reportUnnecessaryCast = "warning"   # Equivalent to warn_redundant_casts = true
+reportUnnecessaryTypeIgnoreComment = "warning"  # Equivalent to warn_unused_ignores = true

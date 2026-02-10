@@ -1,0 +1,177 @@
+# ============================================================================
+# Scaling Two-Stage PulseDB Evaluator Configuration
+# ============================================================================
+#
+# Purpose:
+#   Evaluator configuration for scaling two-stage model evaluation on PulseDB dataset.
+#   Performs inference on two-stage models (approximation + refinement) to predict
+#   ABP waveforms and extract blood pressure values. Supports multi-stage checkpoint
+#   loading for stage1 (approximation) and stage2 (refinement) models with train_ratio support.
+#
+# Inherits:
+#   - base_blood_pressure: Base blood pressure evaluator configuration
+#   - checkpoint_manager: Checkpoint saving configuration
+#   - checkpoint_io: Checkpoint I/O configuration
+#   - progress_bar: Progress bar and logging configuration
+#   - directions: ppg2abp (PPG to ABP direction)
+#   - model: nabnet_inference_scale (NABNet inference scale model)
+#   - processor: waveform_processor_ref_test (waveform processing for testing)
+#   - demographics_text_encoder: Demographics text encoding preprocessor
+#
+# Notes:
+#   - ABP waveform target (ppg2abp direction - default)
+#   - Heavily inherits from existing full base_blood_pressure config
+#   - Overrides/adds only new sections for Phase 2 (multi-stage, train_ratio)
+#   - Default model: nabnet_inference_scale (override via CLI: model@evaluator.model=mdvisco_inference_scale)
+#   - Supports demographics (age, gender, height, weight, BMI) for models with use_demographics=true
+#   - Trainer name: scaling_two_stage
+#
+# ============================================================================
+
+# @package evaluator
+defaults:
+  - base_blood_pressure  # Full base config (datasets, processor, etc.)
+  - /checkpoint_manager@checkpoint_managers.save: checkpoint_manager
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - /progress_bar@progress_bar: progress_bar
+  - /directions@directions: ppg2abp
+  - /model@model: nabnet_inference_scale
+  - /processor@processor: waveform_processor_ref_test
+  - /input_preprocessor@demographics_text_encoder: demographics_text_encoder
+  - _self_  # Apply overrides below
+
+# Training-aligned checkpoint path/filename templates (single braces for Python .format())
+# Override via CLI: base_dir, trainer_name, model_name, direction (no path_format needed)
+# Example constructed path: WaveRecApp/UCI/WaveRecApp_patchtst_BS_32_.../ppg2abpcheckpoint_S_103.pt
+# 
+# Override/add checkpoint managers for multi-stage (add stage1/stage2, update save with {train_ratio})
+# 
+# Note on Concat vs Build Mode:
+# - 'save' manager uses BUILD MODE (trainer-aligned format with placeholders) requiring full kwargs
+#   (model_name, trainer_name, dataset_name, batch_size, etc.)
+# - 'stage1' and 'stage2' managers currently use BUILD MODE with full trainer-aligned formats.
+#   For explicit paths without training hyperparameters, override with concat mode formats:
+#   Example: path_format='weights', filename_format='stage1_model.pt' (no placeholders except {file_ext})
+#   This allows loading with minimal kwargs (epoch, direction, seed, train_ratio only if needed)
+checkpoint_managers:
+  save:
+    _target_: src.utils.checkpoint_manager.CheckpointManager
+    base_dir: outputs/joint/
+    path_format: '{trainer_name}Model/{dataset_name}/{trainer_name}Model_{model_name}_BS_{batch_size}_E_{num_epochs}_TR_{train_ratio}_S_{seed}'
+    filename_format: '{direction}checkpoint{epoch_suffix}{file_ext}'
+  stage1:
+    _target_: src.utils.checkpoint_manager.CheckpointManager
+    base_dir: weights/pretrained/stage1/
+    path_format: '{trainer_name}/{dataset_name}/{trainer_name}_{model_name}_BS_{batch_size}_E_{num_epochs}_LR_{learning_rate}{optional_params}_P_{scheduler_patience}_ES_{early_stopping_patience}{extra_flags}'
+    filename_format: '{direction}checkpoint_S_{seed}{epoch_suffix}{file_ext}'
+  stage2:
+    _target_: src.utils.checkpoint_manager.CheckpointManager
+    base_dir: weights/pretrained/stage2/
+    path_format: '{trainer_name}/{dataset_name}/{trainer_name}_{model_name}_BS_{batch_size}_E_{num_epochs}_LR_{learning_rate}{optional_params}_P_{scheduler_patience}_ES_{early_stopping_patience}{extra_flags}'
+    filename_format: '{direction}checkpoint_S_{seed}{epoch_suffix}{file_ext}'
+
+# ============================================================================
+# CHECKPOINT PATH CONFIGURATION
+# ============================================================================
+#
+# path_format: Controls subdirectory structure within base_dir
+#   - Empty string ('') = flat directory (files directly in base_dir)
+#   - Non-empty = subdirectory path (e.g., 'weights/stage1')
+#   - Can include format placeholders: {seed}, {epoch}, etc.
+#
+# filename_format: Checkpoint filename with format placeholders
+#   - Format placeholders: {seed}, {epoch}, {direction}, etc.
+#   - Example: 'checkpoint_S_{seed}.pt' → 'checkpoint_S_103.pt' (seed=103)
+#
+# Path Resolution:
+#   - Final path = base_dir / path_format / filename_format.format(...)
+#   - With path_format='': base_dir / filename_format.format(...)
+#   - With path_format='weights/stage1': base_dir / weights/stage1 / filename_format.format(...)
+#
+# CLI Override Examples:
+#   # Flat directory (path_format='' default):
+#   evaluator.checkpoint_managers.stage1.base_dir=/path/to/checkpoints
+#   evaluator.checkpoint_managers.stage1.filename_format="checkpoint_S_{seed}.pt"
+#   # Result: /path/to/checkpoints/checkpoint_S_103.pt
+#
+#   # Subdirectory structure:
+#   evaluator.checkpoint_managers.stage1.base_dir=/path/to/checkpoints
+#   evaluator.checkpoint_managers.stage1.path_format="weights/stage1"
+#   evaluator.checkpoint_managers.stage1.filename_format="checkpoint_S_{seed}.pt"
+#   # Result: /path/to/checkpoints/weights/stage1/checkpoint_S_103.pt
+#
+# Important: Always quote filename_format in CLI when using {seed} or other placeholders
+#   to prevent bash brace expansion. Use: filename_format="checkpoint_S_{seed}.pt"
+#
+
+# Add checkpoint mapping for multi-stage loading (single-stage uses just 'model'; no optimizer/scheduler for evaluators)
+checkpoint_mapping:
+  model:
+    manager: save
+    checkpoint_key: model_state_dict
+    target_key: model
+  stage1:
+    manager: stage1
+    checkpoint_key: model_state_dict
+    target: stage1
+  stage2:
+    manager: stage2
+    checkpoint_key: model_state_dict
+    target: stage2
+
+# Model is now loaded via config group (/model@model: nabnet_inference_scale)
+# Override via CLI: model@evaluator.model=mdvisco_inference_scale (or other inference-scale configs)
+# Stage models can be overridden: model@evaluator.model.stage1_model=... model@evaluator.model.stage2_model=...
+
+# ============================================================================
+# INPUT PREPROCESSING CONFIGURATION (Blood Pressure Evaluator)
+# ============================================================================
+#
+# NEW FORMAT (Lazy Normalization):
+# This evaluator uses lazy normalization for flexible BP estimation.
+# Default direction: ppg2abp (inherited from base_blood_pressure, can be overridden via CLI)
+# This evaluator handles ABP waveform evaluation for two-stage scaling models.
+#
+input_preprocessing:
+  _convert_: all
+  source:
+    vital: "ppg"              # Source vital sign (typically PPG for BP estimation)
+    norm: "minmax_zc"         # Min-max + zero-center normalization
+  target:
+    vital: "abp"              # Target vital sign (ABP waveform for BP extraction)
+    norm: "global_minmax"     # Global normalization using dataset BP constants
+  include:
+    - bp_raw                  # Include raw BP values for metrics computation
+    - age_raw                 # Demographics required for PatchTST models with use_demographics=true
+    - gender_raw
+    - height_raw
+    - weight_raw
+    - bmi_raw
+
+# Evaluation parameters (inherits most, override as needed)
+trainer_name: scaling_two_stage
+
+# Usage Examples
+# ============================================================================
+# 1. Command line usage:
+#    python -m src.test evaluator=scaling_two_stage_pulsedb_evaluator \
+#      test_dataset=test_pulsedb \
+#      test_dataset.dataset_path=/path/to/dataset \
+#      evaluator.checkpoint_managers.stage1.base_dir=/path/to/stage1 \
+#      evaluator.checkpoint_managers.stage1.filename_format="checkpoint_S_{seed}.pt" \
+#      evaluator.checkpoint_managers.stage2.base_dir=/path/to/stage2 \
+#      evaluator.checkpoint_managers.stage2.filename_format="checkpoint_S_{seed}.pt"
+#
+# 2. Override model:
+#    python -m src.test evaluator=scaling_two_stage_pulsedb_evaluator \
+#      evaluator.model=mdvisco_inference_scale
+#
+# 3. Override checkpoint paths:
+#    python -m src.test evaluator=scaling_two_stage_pulsedb_evaluator \
+#      evaluator.checkpoint_managers.stage1.base_dir=/custom/stage1/path \
+#      evaluator.checkpoint_managers.stage2.base_dir=/custom/stage2/path
+#
+# 4. Override direction:
+#    python -m src.test evaluator=scaling_two_stage_pulsedb_evaluator \
+#      evaluator.directions=ecg2abp
+# ============================================================================

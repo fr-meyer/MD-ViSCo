@@ -1,0 +1,172 @@
+# ============================================================================
+# Feature Extraction Evaluator Configuration
+# ============================================================================
+#
+# Purpose:
+#   Evaluator configuration for feature extraction tasks. Performs inference
+#   on models to generate waveforms, then extracts features (e.g., ECG/PPG features)
+#   from the generated waveforms and saves them to HDF5 files for downstream analysis.
+#
+# Inherits:
+#   - base_feature_extraction: Base feature extraction evaluator configuration
+#   - checkpoint_manager: Checkpoint saving configuration
+#   - checkpoint_io: Checkpoint I/O configuration
+#   - progress_bar: Progress bar and logging configuration
+#   - directions: ppg2ecg (PPG to ECG direction, can be overridden)
+#   - model: wavenet (WaveNet model, can be overridden)
+#   - processor: waveform_processor_ecg_features (ECG feature extraction processor)
+#
+# Notes:
+#   - Default direction: ppg2ecg (can be overridden via CLI: directions=ecg2ppg)
+#   - Default model: wavenet (can be overridden via CLI: model=mdvisco_approximation_uci)
+#   - Processor ensures evaluator feature extraction uses post-processed waveforms
+#   - Default pairs the ECG extractor with the default direction (ppg2ecg)
+#   - Override with processor=waveform_processor_ppg_features when extracting PPG features
+#   - Features are saved to HDF5 file: {dataset}_{model}_{direction}_{seed}_features.h5
+#   - GT-Only Mode: Set load_model_weights=false and omit model components to extract
+#     features from ground truth waveforms without model inference
+#
+# ============================================================================
+
+# @package evaluator
+defaults:
+  - base_feature_extraction
+  - /checkpoint_manager@checkpoint_managers.save: checkpoint_manager
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - /progress_bar@progress_bar: progress_bar
+  - /directions@directions: ppg2ecg  # Default direction, can be overridden via CLI: directions=ecg2ppg
+  - /model@model: wavenet  # Default model, can be overridden via CLI: model=mdvisco_approximation_uci
+  # Processor ensures evaluator feature extraction uses post-processed waveforms
+  # Default pairs the ECG extractor with the default direction (ppg2ecg). Override with
+  # `processor=waveform_processor_ppg_features` when extracting PPG features (ecg2ppg/abp2ppg).
+  - /processor@processor: waveform_processor_ecg_features
+  - _self_
+
+input_preprocessing:
+  source:
+    - vital: "ppg"
+      norm: "minmax_zc"
+    - vital: "ecg"
+      norm: "minmax_zc"
+    - vital: "abp"
+      norm: "minmax_zc"  # or "global_minmax" depending on your needs
+  target:
+    - vital: "ppg"
+      norm: "minmax_zc"
+    - vital: "ecg"
+      norm: "minmax_zc"
+    - vital: "abp"
+      norm: "minmax_zc"  # or "global_minmax" depending on your needs
+
+# Checkpoint managers: 'save' for saving results, 'model' for loading checkpoints
+# Both can be overridden via CLI if needed
+checkpoint_managers:
+  model:
+    _target_: src.utils.checkpoint_manager.CheckpointManager
+    base_dir: ???
+
+checkpoint_mapping:
+  model:
+    manager: model
+    checkpoint_key: model_state_dict
+    target_key: model
+
+# ============================================================================
+# PROCESSOR CONFIGURATION FOR FEATURE EXTRACTION
+# ============================================================================
+#
+# The evaluator uses a processor to post-process model outputs and extract features.
+# Choose the appropriate processor variant based on the target signal type:
+#
+# ECG Feature Extraction (PPG2ECG, ABP2ECG):
+#   defaults:
+#     - /processor@processor: waveform_processor_ecg_features
+#
+# PPG Feature Extraction (ECG2PPG, ABP2PPG):
+#   defaults:
+#     - /processor@processor: waveform_processor_ppg_features
+#
+# CLI Override Examples:
+#   python -m src.test evaluator=feature_extraction_evaluator \
+#     processor=waveform_processor_ecg_features \
+#     processor.extractor.sampling_rate=500
+#
+#   python -m src.test evaluator=feature_extraction_evaluator \
+#     processor=waveform_processor_ppg_features \
+#     processor.extractor.strict_mode=false
+#
+# The processor automatically extracts features during inference via the configured
+# extractor (ECGFeatureExtractor or PPGFeatureExtractor). Features are merged into
+# the output dict alongside the waveform to preserve the legacy HDF5 schema.
+#
+# Extractor Parameter Overrides:
+#   - ECG sampling rate: processor.extractor.sampling_rate=500
+#   - ECG strict mode: processor.extractor.strict_mode=false
+#   - PPG filter cutoffs: processor.extractor.fL=0.7 processor.extractor.fH=15.0
+#   - PPG smoothing: processor.extractor.sm_wins.ppg=70
+#
+# ============================================================================
+# FEATURE EXTRACTION EVALUATOR CONFIGURATION
+# ============================================================================
+#
+# Workflow:
+# 1. Model generates waveform predictions (PPG/ECG) from input signals
+# 2. Processor.process(..., stage="test") trims/normalizes outputs and invokes the configured extractor
+# 3. Features are saved to HDF5 file: {dataset}_{model}_{direction}_{seed}_features.h5
+# 4. GT-Only Mode: Set load_model_weights=false and omit model components to extract
+#    features from ground truth waveforms without model inference (processor with extractor remains required)
+#
+# CLI Override Examples:
+# - Change direction: python test.py evaluator=feature_extraction_evaluator directions=ecg2ppg
+# - Change model: python test.py evaluator=feature_extraction_evaluator model=mdvisco_approximation_uci
+# - Change output: python test.py evaluator=feature_extraction_evaluator evaluator.output_dir=results/my_features
+# - GT-only (model disabled):
+#     python -m src.test evaluator=feature_extraction_evaluator model@evaluator.model=null evaluator.load_model_weights=false
+# - Checkpoint skip (random initialization):
+#     python -m src.test evaluator=feature_extraction_evaluator evaluator.load_model_weights=false
+#
+# ============================================================================
+# GT-ONLY MODE (No Model Inference)
+# ============================================================================
+#
+# To extract features from ground truth waveforms without model inference:
+# 1. Set load_model_weights: false
+# 2. Omit or set to null/empty: model, checkpoint_managers, checkpoint_io
+# 3. Omit checkpoint-related parameters: checkpoint_epoch, trainer_name
+#
+# Example CLI: python -m src.test evaluator=feature_extraction_evaluator test_dataset=test_uci \
+#   evaluator.load_model_weights=false evaluator.directions=ppg2ecg \
+#   +evaluator.model=null +evaluator.checkpoint_managers=null +evaluator.checkpoint_io=null
+#
+# Output: Features saved with origin="ground_truth", model_name="ground_truth"
+# Output path: {output_dir}/{DatasetName}/ground_truth/seed_{seed}/features_{DIRECTION}.h5
+#
+# ============================================================================
+
+# Usage Examples
+# ============================================================================
+# 1. Command line usage:
+#    python -m src.test evaluator=feature_extraction_evaluator \
+#      test_dataset=test_uci \
+#      test_dataset.dataset_path=/path/to/dataset
+#
+# 2. Override direction or model:
+#    python -m src.test evaluator=feature_extraction_evaluator \
+#      evaluator.directions=ecg2ppg \
+#      evaluator.model=mdvisco_approximation_uci
+#
+# 3. Override processor for PPG feature extraction:
+#    python -m src.test evaluator=feature_extraction_evaluator \
+#      evaluator.processor=waveform_processor_ppg_features \
+#      evaluator.processor.extractor.sampling_rate=500
+#
+# 4. Override checkpoint path:
+#    python -m src.test evaluator=feature_extraction_evaluator \
+#      evaluator.checkpoint_managers.model.base_dir=/path/to/checkpoints
+#
+# 5. GT-only mode (extract features from ground truth without model):
+#    python -m src.test evaluator=feature_extraction_evaluator \
+#      evaluator.load_model_weights=false \
+#      +evaluator.model=null +evaluator.checkpoint_managers=null +evaluator.checkpoint_io=null
+# ============================================================================
+

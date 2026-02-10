@@ -1,0 +1,39 @@
+# ============================================================================
+# ReduceLROnPlateau Scheduler Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for ReduceLROnPlateau scheduler. Composes
+#   base_reduce_lr_on_plateau from the scheduler ConfigStore to provide
+#   adaptive learning rate reduction parameters based on validation metrics.
+#
+# Inherits:
+#   - base_reduce_lr_on_plateau: Base ReduceLROnPlateau scheduler configuration from ConfigStore
+#
+# Notes:
+#   - _partial_ is inherited from BaseSchedulerConfig, so no need to specify it here
+#   - Defaults ordering: base config first, then _self_ for local overrides
+#   - Reduces learning rate when a metric has stopped improving
+#
+# ============================================================================
+
+defaults:
+  - base_reduce_lr_on_plateau
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - scheduler: reduce_lr_on_plateau
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      scheduler=reduce_lr_on_plateau
+#
+# 3. Override scheduler parameters:
+#    python src/train.py scheduler=reduce_lr_on_plateau \
+#      scheduler.mode=min \
+#      scheduler.factor=0.5 \
+#      scheduler.patience=5
+# ============================================================================

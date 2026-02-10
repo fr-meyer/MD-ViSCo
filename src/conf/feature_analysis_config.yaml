@@ -1,0 +1,55 @@
+# ============================================================================
+# Feature Analysis Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for feature analysis workflows. Defines
+#   parameters for extracting and analyzing features from trained models
+#   and ground truth data.
+#
+# Inherits:
+#   - None (standalone configuration)
+#
+# Notes:
+#   - See README.md → Usage Examples → Feature Analysis for detailed
+#     usage instructions, required/optional parameters, and examples
+#   - Required parameters (gt_features_file, model_name, seed, direction,
+#     dataset_name) must be provided via CLI
+#   - Optional parameters have defaults defined below
+#
+# ============================================================================
+
+defaults:
+  - _self_
+
+feature_analysis:
+  # Required (must be provided via CLI or override)
+  gt_features_file: ???
+  model_name: ???
+  seed: ???
+  direction: ???  # PPG2ECG, ECG2PPG, ABP2PPG, ABP2ECG
+  dataset_name: ???  # PulseDB, UCI
+  # Optional (defaults below)
+  features_base_path: results/features
+  output_csv: results/features_results
+
+# Usage Examples
+# ============================================================================
+# 1. Basic feature analysis:
+#    python -m src.script.features.feature_analysis \
+#      feature_analysis.gt_features_file=/path/to/gt_features.h5 \
+#      feature_analysis.model_name=mdvisco \
+#      feature_analysis.seed=42 \
+#      feature_analysis.direction=PPG2ECG \
+#      feature_analysis.dataset_name=PulseDB
+#
+# 2. Override output paths:
+#    python -m src.script.features.feature_analysis \
+#      feature_analysis.gt_features_file=/path/to/gt_features.h5 \
+#      feature_analysis.model_name=nabnet \
+#      feature_analysis.seed=42 \
+#      feature_analysis.direction=ECG2PPG \
+#      feature_analysis.dataset_name=UCI \
+#      feature_analysis.features_base_path=custom/features \
+#      feature_analysis.output_csv=custom/results
+# ============================================================================

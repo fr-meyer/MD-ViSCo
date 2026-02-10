@@ -1,3 +1,36 @@
+# ============================================================================
+# Checkpoint Manager Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for checkpoint manager. Composes base_checkpoint_manager
+#   from the Hydra ConfigStore to provide checkpoint saving and loading management
+#   parameters for model training and evaluation workflows.
+#
+# Inherits:
+#   - base_checkpoint_manager: Base checkpoint manager configuration from ConfigStore
+#     (defined in src/utils/checkpoint_manager.py)
+#
+# Notes:
+#   - Manages checkpoint saving and loading operations
+#   - Override via trainer.checkpoint_managers.save.base_dir=... etc.
+#   - Used by trainers to save model checkpoints during training
+#
+# ============================================================================
+
 defaults:
   - base_checkpoint_manager
   - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - checkpoint_manager: checkpoint_manager
+#
+# 2. Override checkpoint directory:
+#    python src/train.py trainer.checkpoint_managers.save.base_dir=/path/to/checkpoints
+#
+# 3. Override checkpoint saving frequency:
+#    python src/train.py trainer.checkpoint_managers.save.save_every_n_epochs=5
+# ============================================================================

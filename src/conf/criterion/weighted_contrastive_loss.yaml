@@ -1,4 +1,38 @@
-# Weighted Contrastive Loss configuration
+# ============================================================================
+# Weighted Contrastive Loss Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for weighted contrastive loss (WCL). Composes
+#   base weighted contrastive loss from the Hydra ConfigStore to provide
+#   contrastive learning loss parameters for representation learning.
+#
+# Inherits:
+#   - base_weighted_contrastive_loss: Base weighted contrastive loss configuration from ConfigStore
+#
+# Notes:
+#   - Used for contrastive learning to learn better representations
+#   - Applies weighting to positive and negative pairs
+#   - Commonly used in combination with regression losses for improved performance
+#
+# ============================================================================
+
 defaults:
   - base_weighted_contrastive_loss
   - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /criterion@criterion: weighted_contrastive_loss
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_mdvisco \
+#      criterion=weighted_contrastive_loss
+#
+# 3. Override loss weight or temperature:
+#    python src/train.py criterion=weighted_contrastive_loss \
+#      criterion.weight=0.1 \
+#      criterion.temperature=0.07
+# ============================================================================

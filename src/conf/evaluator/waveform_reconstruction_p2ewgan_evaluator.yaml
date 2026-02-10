@@ -1,0 +1,56 @@
+# ============================================================================
+# Waveform Reconstruction P2E-WGAN Evaluator Configuration
+# ============================================================================
+#
+# Purpose:
+#   Evaluator configuration for P2E-WGAN generator-only inference with waveform
+#   reconstruction. Use this preset when loading pre-trained P2E-WGAN generator
+#   checkpoints (from p2ewgan training) for waveform evaluation.
+#
+# Inherits:
+#   - waveform_reconstruction: Waveform reconstruction evaluator configuration
+#   - model: p2ewgan_generator_inference (P2E-WGAN generator inference model)
+#
+# Notes:
+#   - Equivalent CLI overrides on waveform_reconstruction:
+#     model@evaluator.model=p2ewgan_generator_inference \
+#     evaluator.checkpoint_mapping.model.checkpoint_key=generator_state_dict
+#   - Checkpoint mapping uses generator_state_dict instead of model_state_dict
+#   - Loads only the generator component from P2E-WGAN checkpoints
+#
+# ============================================================================
+
+# @package evaluator
+defaults:
+  - waveform_reconstruction
+  - /model@model: p2ewgan_generator_inference
+  - _self_
+
+checkpoint_mapping:
+  model:
+    manager: model
+    checkpoint_key: generator_state_dict
+    target_key: model
+
+# Usage Examples
+# ============================================================================
+# 1. Command line usage:
+#    python -m src.test evaluator=waveform_reconstruction_p2ewgan_evaluator \
+#      test_dataset=test_uci \
+#      test_dataset.dataset_path=/path/to/dataset \
+#      evaluator.checkpoint_managers.model.base_dir=/path/to/p2ewgan/checkpoints
+#
+# 2. Override checkpoint path:
+#    python -m src.test evaluator=waveform_reconstruction_p2ewgan_evaluator \
+#      evaluator.checkpoint_managers.model.base_dir=/path/to/checkpoints \
+#      evaluator.checkpoint_managers.model.trainer_name=WaveRecRef
+#
+# 3. Override direction:
+#    python -m src.test evaluator=waveform_reconstruction_p2ewgan_evaluator \
+#      evaluator.directions=ecg2abp
+#
+# 4. Equivalent CLI override on waveform_reconstruction:
+#    python -m src.test evaluator=waveform_reconstruction \
+#      evaluator.model=p2ewgan_generator_inference \
+#      evaluator.checkpoint_mapping.model.checkpoint_key=generator_state_dict
+# ============================================================================

@@ -1,4 +1,35 @@
-# L1 Loss configuration
+# ============================================================================
+# L1 Loss Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for L1 (Mean Absolute Error) loss. Composes
+#   base_l1_loss from the Hydra ConfigStore to provide L1 loss parameters
+#   for model training.
+#
+# Inherits:
+#   - base_l1_loss: Base L1 loss configuration from ConfigStore
+#
+# Notes:
+#   - L1 loss is robust to outliers compared to L2 loss
+#   - Commonly used for regression tasks, especially waveform reconstruction
+#
+# ============================================================================
+
 defaults:
   - base_l1_loss
   - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /criterion@criterion: l1_loss
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      criterion=l1_loss
+#
+# 3. Override loss weight if needed:
+#    python src/train.py criterion=l1_loss criterion.weight=1.0
+# ============================================================================

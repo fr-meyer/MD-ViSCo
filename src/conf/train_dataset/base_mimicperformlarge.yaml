@@ -1,0 +1,71 @@
+# ============================================================================
+# Base MimicPERFormLarge Dataset Configuration
+# ============================================================================
+#
+# Purpose:
+#   Base configuration providing default values for MimicPERFormLarge dataset configs.
+#   Defines dataset-specific parameters including input size, splitting strategies,
+#   and RR prediction task configuration.
+#
+# Base:
+#   - _target_: src.dataset.mimicperformlarge_dataset.MimicPERFormLargeConfig
+#
+# Notes:
+#   - This dataset is used for RR prediction, not BP prediction
+#   - Input size: 4001 samples (signals are length 4001 at 125 Hz)
+#   - BP normalization bounds are placeholder values required by base config
+#     but unused for this dataset
+#   - Default split: 80% train, 20% validation, 0% test
+#   - Processor metadata: target_vital_type=IMP, extract_scalars_default=false
+#
+# ============================================================================
+
+_target_: src.dataset.mimicperformlarge_dataset.MimicPERFormLargeConfig
+dataset_name: MimicPERFormLarge
+
+# Input size for models (controls automatic padding/trimming)
+# Signals are length 4001 at 125 Hz
+input_size: 4001
+
+# BP normalization bounds (placeholder values)
+# This dataset is used for RR prediction, not BP prediction
+# Values are required by base config but unused for this dataset
+dbp_min: 50.0
+sbp_max: 189.98421357007769
+
+# File path structure
+dataset_folder: MIMIC_PERform/Large/mdvisco_processed/
+
+# Processor metadata configuration
+target_vital_type: IMP
+extract_scalars_default: false
+
+# Dataset splitting configuration
+# All ratios must be between 0.0 and 1.0, and must sum to 1.0
+train_ratio: 0.80
+val_ratio: 0.20
+test_ratio: 0.0
+
+# Splitting strategy flags
+use_patient_split: false
+use_nabnet_vanilla_split: false
+
+# Trimming strategy (only used when trimming is needed)
+trim_strategy: center
+
+# Usage Examples
+# ============================================================================
+# 1. Inherit in dataset configs via Hydra defaults:
+#    defaults:
+#      - base_mimicperformlarge
+#      - _self_
+#
+# 2. Override specific parameters:
+#    python src/train.py train_dataset=train_mimic_perform_large \
+#      train_dataset.train_ratio=0.75 \
+#      train_dataset.val_ratio=0.25
+#
+# 3. Override processor metadata:
+#    python src/train.py train_dataset=train_mimic_perform_large \
+#      train_dataset.extract_scalars_default=true
+# ============================================================================

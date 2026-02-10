@@ -1,0 +1,35 @@
+# ============================================================================
+# PatchTST Model – Unified Configuration
+# ============================================================================
+# Single config for both approximation (waveform) and refinement (SBP/DBP) tasks.
+# Paper: "A Time Series is Worth 64 Words..." arXiv:2211.14730, §A.1.4 (page 14), §4.1 (page 6)
+# Validation: Validated 2026-01-31
+# Datasets: UCI (1024) | PulseDB (1280) | MIMIC-Perform-Large (4000)
+#
+# Params set here (source):
+#   input_length → dataset (Hydra interpolation)
+#   use_demographics, num_targets → task-specific overrides
+#   All architecture params (d_model, num_encoder_layers, etc.) → base_patchtst dataclass defaults
+#
+# Notes:
+#   - Paper-aligned configuration.
+#   - For refinement: override model.num_targets=2 for SBP/DBP output
+#   - PulseDB demographics: override model.use_demographics=true model.num_demographic_channels=5
+#
+# Usage:
+#   torchrun --standalone --nproc_per_node=1 --module src.train -m \
+#     model=patchtst trainer=approximation_trainer_patchtst \
+#     train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_patchtst
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+# Context and patch configuration
+input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}  # Dynamically adapts to dataset (UCI: 1024, PulseDB: 1280, MIMIC: 4000)
+
+# Additional parameters
+use_demographics: false  # Approximation stage does not use demographics
+num_targets: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}  # Matches input length for waveform reconstruction; override to 2 for refinement

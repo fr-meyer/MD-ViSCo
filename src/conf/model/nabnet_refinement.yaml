@@ -1,0 +1,29 @@
+# ============================================================================
+# NABNet Refinement Model – Unified Configuration
+# ============================================================================
+# Paper: NABNet: A Nested Attention-guided BiConvLSTM network... (DOI: 10.1016/j.bspc.2022.104247)
+# Validation: Needs verification
+# Datasets: UCI (1024) | PulseDB (1280)
+#
+# Params set here (source):
+#   Composition only: stage1=shallowunet_feature_extraction, stage2=multi_mlp_regressor_bp; no direct param overrides
+#
+# Notes:
+#   - Two-stage cascade: ShallowUNet (feature extraction) → MultiMLPRegressor (BP prediction)
+#   - Stage1 uses model_width=128 (vanilla); override via model.stage1_model.model_width=84
+#   - Output format: {'sbp', 'dbp'} (no waveform prediction)
+#
+# Usage:
+#   torchrun --module src.train -m model=nabnet_refinement trainer=refinement_trainer_nabnet train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_two_stage_cascade_model
+  - /model@stage1_model: shallowunet_feature_extraction
+  - /model@stage2_model: multi_mlp_regressor_bp
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+# Model class and identification (other params from TwoStageCascadeModelConfig dataclass defaults)
+model_name: NABNetRefinement
+auto_eval_in_forward: true

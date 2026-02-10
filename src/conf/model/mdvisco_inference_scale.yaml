@@ -1,0 +1,28 @@
+# ============================================================================
+# MD-ViSCo Inference-Scale - Unified Configuration
+# ============================================================================
+# Two-stage scaling for BP waveform reconstruction (inference): Stage1 approximation → Stage2 refinement; unscaling via SBP/DBP.
+#
+# Paper: MD-ViSCo (arXiv:2506.08357)
+# Datasets: UCI (1024) | PulseDB (1280)
+# Validation: Needs verification
+#
+# Params set here (source):
+#   stage1_model: mdvisco_approximation, stage2_model: mdvisco_refinement → composition
+#
+# Notes:
+#   - For inference workflows; both stages use unified configs that adapt to dataset.
+#
+# Usage:
+#   python -m src.test evaluator=scaling_two_stage_uci_evaluator model@evaluator.model=mdvisco_inference_scale \
+#     train_dataset=train_uci_refinement_abp test_dataset=test_uci_refinement_abp
+# ============================================================================
+
+defaults:
+  - base_two_stage_scaling_model
+  - /model@stage1_model: mdvisco_approximation  # Unified config - adapts to dataset
+  - /model@stage2_model: mdvisco_refinement      # Unified config - adapts to dataset
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+model_name: MDViSCoTwoStageScaling

@@ -1,5 +1,40 @@
-# Deep Supervision Loss configuration
+# ============================================================================
+# Deep Supervision Loss Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for deep supervision loss. Composes base deep
+#   supervision loss and a base criterion from the Hydra ConfigStore to provide
+#   multi-scale loss parameters for models with intermediate outputs.
+#
+# Inherits:
+#   - base_deep_supervision_loss: Base deep supervision loss configuration from ConfigStore
+#   - /criterion@base_criterion: base_mse_loss: Base loss criterion applied at each scale
+#
+# Notes:
+#   - Applies loss at multiple scales/intermediate layers of the model
+#   - Helps with gradient flow and training stability in deep networks
+#   - Default base criterion is MSE loss, but can be overridden
+#
+# ============================================================================
+
 defaults:
   - base_deep_supervision_loss
   - /criterion@base_criterion: base_mse_loss
   - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /criterion@criterion: deep_supervision_loss
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_mdvisco \
+#      criterion=deep_supervision_loss
+#
+# 3. Override base criterion or weights:
+#    python src/train.py criterion=deep_supervision_loss \
+#      criterion.base_criterion=l1_loss \
+#      criterion.weights=[0.5,0.3,0.2]
+# ============================================================================

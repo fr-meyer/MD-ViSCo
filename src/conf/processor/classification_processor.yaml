@@ -1,0 +1,73 @@
+# ============================================================================
+# Classification Processor Configuration
+# ============================================================================
+#
+# Purpose:
+#   ClassificationOutputProcessor configuration for classification tasks.
+#   Processes model outputs to produce logits, probabilities, and class
+#   predictions for classification models.
+#
+# Inherits:
+#   - base_classification_processor: Base classification processor configuration
+#     (ClassificationProcessorConfig)
+#
+# Notes:
+#   - processor.process() always returns logits in the canonical "predictions" key
+#     while derived probabilities/class predictions remain stage-agnostic extras
+#   - Stage-aware behavior:
+#     * stage="train": returns logits for loss + passthrough extras
+#     * stage="val"/"test": identical path (metrics handled in trainer)
+#   - All defaults match; no overrides needed
+#
+# ============================================================================
+
+defaults:
+  - base_classification_processor
+
+# Debug validation (enable only during development/testing):
+#   validate_probability_constraints: true
+#     - Checks probabilities lie within [0, 1]
+#     - Ensures per-row probabilities sum to approximately 1.0
+#     - Logs warnings if constraints fail (does not raise)
+#     - Useful when debugging model output anomalies
+
+# Usage:
+# This config is referenced in trainer configs via defaults:
+#   defaults:
+#     - /processor@processor: classification_processor
+#
+# Override via command line:
+#   python src/train.py trainer=classification_trainer \
+#     processor.threshold=0.3 \
+#     processor.apply_softmax=false
+#
+# Common configurations:
+#
+# Binary AF classification (single output + sigmoid):
+#   processor:
+#     num_classes: 2
+#     threshold: 0.5
+#     apply_softmax: false
+#
+# Binary AF classification (two outputs + softmax):
+#   processor:
+#     num_classes: 2
+#     threshold: 0.5  # Not used (argmax instead)
+#     apply_softmax: true
+#
+# Multi-class disease classification:
+#   processor:
+#     num_classes: 5
+#     apply_softmax: true
+#
+# Imbalanced binary classification (custom threshold):
+#   processor:
+#     num_classes: 2
+#     threshold: 0.3  # Lower threshold for rare positive class
+#     apply_softmax: false
+#
+# NOTE: Nested config: usage (e.g., processor.config.num_classes) is no longer supported.
+# All processor parameters (num_classes, threshold, apply_softmax) must be specified at
+# the top level of the processor config.
+#
+# ============================================================================

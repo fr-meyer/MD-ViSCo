@@ -1,0 +1,28 @@
+# ============================================================================
+# PPG2ABP Cascade Model – Unified Configuration
+# ============================================================================
+# Paper: PPG2ABP: Translating Photoplethysmogram (PPG) Signals to Arterial Blood Pressure (ABP) Waveforms... (arXiv:2005.01669v2, §3.3)
+# Validation: Validated 2026-01-29
+# Datasets: UCI (1024) | PulseDB (1280)
+#
+# Params set here (source):
+#   Composition only: stage1=ppg2abp_approximation, stage2=ppg2abp_refinement; no direct param overrides
+#
+# Notes:
+#   - Two-stage cascade: UNetDS64 (approximation) → MultiResUNet1D (refinement)
+#   - Stage1: base_channels=64; Stage2: alpha=2.5 (paper defaults)
+#
+# Usage:
+#   torchrun --module src.train -m model=ppg2abp_cascade trainer=approximation_trainer_mdvisco train_dataset=train_uci test_dataset=test_uci
+# ============================================================================
+
+defaults:
+  - base_two_stage_cascade_model
+  - /model@stage1_model: ppg2abp_approximation
+  - /model@stage2_model: ppg2abp_refinement
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+# Model class and identification (other params from TwoStageCascadeModelConfig dataclass defaults)
+model_name: PPG2ABPCascade
+auto_eval_in_forward: true

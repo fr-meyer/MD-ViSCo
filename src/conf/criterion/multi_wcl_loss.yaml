@@ -1,8 +1,29 @@
-# Weighted Contrastive Loss configuration
+# ============================================================================
+# Multi Weighted Contrastive Loss Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for Multi Weighted Contrastive Loss (Multi-WCL).
+#   Composes base_multi_wcl_loss from the Hydra ConfigStore to provide
+#   multi-term contrastive loss parameters for model training.
+#
+# Inherits:
+#   - base_multi_wcl_loss: Base multi-WCL loss configuration from ConfigStore
+#
+# Notes:
+#   - Combines multiple weighted contrastive loss terms for different embeddings
+#   - Supports demographic-aware contrastive learning (age, gender, height, weight, BMI)
+#   - loss_terms lists each WCL term and required demographic field keys
+#     (age_raw, gender_raw, height_raw, weight_raw, bmi_raw)
+#   - See docs/criterion.md for demographic field usage
+#
+# ============================================================================
+
 defaults:
   - base_multi_wcl_loss
   - _self_
 
+# loss_terms lists each WCL term and required demographic field keys (age_raw, gender_raw, height_raw, weight_raw, bmi_raw). See docs/criterion.md for demographic field usage.
 loss_terms:
   - _target_: src.criterions.weighted_contrastive_loss.WeightedContrastiveLoss
     name: "ecg_sbp"
@@ -27,5 +48,33 @@ loss_terms:
   - _target_: src.criterions.weighted_contrastive_loss.WeightedContrastiveLoss
     name: "text_gender_wcl"
     embedding_key: "text_embeddings"
-    weight_key: "gender"
+    weight_key: "gender_raw"
+    temperature: 4.0
+    temperature_embeddings: 4.0
+    temperature_weight: 1.0
+    threshold: 1.0  # ensure only same-gender pairs contribute
     scale_factor: 1e-2
+  - _target_: src.criterions.weighted_contrastive_loss.WeightedContrastiveLoss
+    name: "text_age_wcl"
+    embedding_key: "text_embeddings"
+    weight_key: "age_raw"
+    temperature: 4.0
+    temperature_embeddings: 4.0
+    temperature_weight: 4.0
+    threshold: 0.0235  # Default wcl_age_threshold from BPModelConfig
+    scale_factor: 1e-2
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /criterion@criterion: multi_wcl_loss
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_mdvisco \
+#      criterion=multi_wcl_loss
+#
+# 3. Override loss terms or scale factors:
+#    python src/train.py criterion=multi_wcl_loss \
+#      criterion.loss_terms[0].scale_factor=1e-2
+# ============================================================================

@@ -1,0 +1,72 @@
+# ============================================================================
+# MD-ViSCo Preprocessing Configuration
+# ============================================================================
+#
+# Purpose:
+#   Main entry point configuration for MD-ViSCo data preprocessing workflows.
+#   Composes preprocessor configuration and defines parameters for converting
+#   raw dataset files into processed HDF5 format suitable for training.
+#
+# Inherits:
+#   - preprocessor: Preprocessor configuration (default: base_pulsedb_preprocessing)
+#
+# Notes:
+#   - This is the primary entry point for preprocessing scripts
+#   - Input and output file paths must be provided via CLI
+#   - Optional include fields can be specified to include raw data fields
+#     (bp_raw, age_raw, gender_raw, height_raw, weight_raw, bmi_raw)
+#   - Models like PatchTST handle broadcasting internally
+#
+# ============================================================================
+
+defaults:
+  - preprocessor: base_pulsedb_preprocessing  # Default to PulseDB preprocessor
+  - _self_
+
+# Optional: Include additional raw data fields in batch
+# Collate function returns these fields as-is; models handle their own processing
+#
+# Available keys (raw dataset fields only):
+#   - bp_raw: Raw blood pressure values [B, 3] (SBP, DBP, MAP)
+#   - age_raw: Age values [B, 1]
+#   - gender_raw: Gender values [B, 1]
+#   - height_raw: Height values [B, 1]
+#   - weight_raw: Weight values [B, 1]
+#   - bmi_raw: BMI values [B, 1]
+#
+# Examples:
+#   include: [bp_raw, age_raw, gender_raw]  # For WCL training
+#   include: [age_raw, gender_raw, height_raw, weight_raw, bmi_raw]  # For models with demographics
+#   include: []  # No additional data (default)
+#
+# Note: Models like PatchTST handle broadcasting internally.
+# Collate function only extracts and returns raw fields.
+
+# Common preprocessing overrides
+preprocessor:
+  input_file: ???  # Must be specified via command line or override
+  output_file: ???  # Must be specified via command line or override
+  save_files: true  # Enable file saving by default
+
+# Usage Examples
+# ============================================================================
+# 1. Basic preprocessing with PulseDB:
+#    python -m src.script.preprocess.preprocess \
+#      preprocessor=pulsedb_preprocessing \
+#      preprocessor.input_file=/path/to/input.mat \
+#      preprocessor.output_file=/path/to/output.h5
+#
+# 2. Preprocessing with UCI dataset:
+#    python -m src.script.preprocess.preprocess \
+#      preprocessor=uci_preprocessing \
+#      preprocessor.input_file=/path/to/input.h5 \
+#      preprocessor.output_file=/path/to/output.h5
+#
+# 3. Include additional raw fields:
+#    python -m src.script.preprocess.preprocess \
+#      preprocessor=pulsedb_preprocessing \
+#      preprocessor.input_file=/path/to/input.mat \
+#      preprocessor.output_file=/path/to/output.h5 \
+#      preprocessor.include=[bp_raw,age_raw,gender_raw]
+# ============================================================================
+

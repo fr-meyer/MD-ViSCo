@@ -1,5 +1,44 @@
+# ============================================================================
+# Regression Multi WCL Loss Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for regression with multi-weighted contrastive loss.
+#   Composes base regression multi-WCL loss and combines it with WCL loss terms
+#   and regression loss term from the Hydra ConfigStore to provide combined
+#   loss parameters for models using both regression and contrastive learning.
+#
+# Inherits:
+#   - base_regression_multi_wcl_loss: Base regression multi-WCL loss configuration from ConfigStore
+#   - /criterion@wcl_loss_terms: multi_wcl_loss: Multi-weighted contrastive loss component
+#   - /criterion@regression_loss_term: l1_loss: Regression loss component (default: L1)
+#
+# Notes:
+#   - Combines regression loss (default: L1) with multi-weighted contrastive loss
+#   - Used for models that benefit from both regression and contrastive learning
+#   - Helps learn better representations by combining supervised and contrastive objectives
+#
+# ============================================================================
+
 defaults:
   - base_regression_multi_wcl_loss
   - /criterion@wcl_loss_terms: multi_wcl_loss
   - /criterion@regression_loss_term: l1_loss
   - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /criterion@criterion: regression_multi_wcl
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_mdvisco \
+#      criterion=regression_multi_wcl
+#
+# 3. Override regression loss term or component weights:
+#    python src/train.py criterion=regression_multi_wcl \
+#      criterion.regression_loss_term=mse_loss \
+#      criterion.regression_weight=1.0 \
+#      criterion.wcl_weight=0.1
+# ============================================================================

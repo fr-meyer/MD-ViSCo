@@ -1,0 +1,63 @@
+# ============================================================================
+# MimicPERFormAF Training Dataset Configuration (1250-sample segments)
+# ============================================================================
+#
+# Purpose:
+#   Training dataset configuration for MimicPERFormAF with 1250-sample segments.
+#   Inherits base MimicPERFormAF settings and defines training-specific preprocessing
+#   and data loading parameters.
+#
+# Inherits:
+#   - base_mimicperformaf: Base MimicPERFormAF dataset configuration
+#
+# Notes:
+#   - BP normalization: dbp_min and sbp_max define the dataset's BP value ranges used for
+#     denormalization during inference. These values are automatically sourced from the base
+#     dataset config (base_mimicperformaf) and used by processors to convert normalized predictions back
+#     to mmHg. MIMIC: Placeholder values (dataset used for AF classification, not BP prediction)
+#   - Default split: 80% train, 20% validation, 0% test
+#   - Supports patient-level splitting
+#
+# ============================================================================
+
+defaults:
+  - base_mimicperformaf
+  - _self_
+
+input_preprocessing:
+  source:
+    - vital: "ecg"
+      norm: "raw"
+    - vital: "ppg"
+      norm: "raw"
+  target:
+    - vital: "ppg"
+      norm: "raw"
+
+input_size: 1250
+
+dataset_path: ???
+file_name: 'MimicPERFormAF_1250_merged_train.h5'
+
+train_ratio: 0.8
+val_ratio: 0.2
+test_ratio: 0.0
+
+use_patient_split: true
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - train_dataset: train_mimic_perform_af_1250
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      train_dataset=train_mimic_perform_af_1250 \
+#      train_dataset.dataset_path=/path/to/mimic/data
+#
+# 3. Override preprocessing or split ratios:
+#    python src/train.py train_dataset=train_mimic_perform_af_1250 \
+#      train_dataset.train_ratio=0.75 \
+#      train_dataset.val_ratio=0.25
+# ============================================================================

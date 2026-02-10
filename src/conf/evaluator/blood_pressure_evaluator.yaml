@@ -1,0 +1,148 @@
+# ============================================================================
+# Blood Pressure Evaluator Configuration
+# ============================================================================
+#
+# Purpose:
+#   Evaluator configuration for blood pressure estimation tasks. Performs inference
+#   on models to predict blood pressure values (SBP, DBP, MAP) from waveforms and
+#   computes BP-specific metrics (MAE, RMSE, AAMI/ANSI compliance, etc.).
+#
+# Inherits:
+#   - base_blood_pressure: Base blood pressure evaluator configuration
+#   - checkpoint_manager: Checkpoint saving configuration
+#   - checkpoint_io: Checkpoint I/O configuration
+#   - progress_bar: Progress bar and logging configuration
+#   - directions: ppg2abp (PPG to ABP direction)
+#   - model: nabnet_inference_scale (NABNet inference scale model)
+#   - processor: waveform_processor_ref_test (waveform processing for testing)
+#
+# Notes:
+#   - Base reference: nabnet_inference_scale; dataset-specific variations via CLI overrides
+#   - Processor aligns evaluator predictions with trainer post-processing pipeline
+#   - Uses lazy normalization for flexible BP estimation
+#   - Supports global_minmax normalization for ABP/BP targets
+#
+# ============================================================================
+
+# @package evaluator
+defaults:
+  - base_blood_pressure
+  - /checkpoint_manager@checkpoint_managers.save: checkpoint_manager
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - /progress_bar@progress_bar: progress_bar
+  - /directions@directions: ppg2abp
+  # Base reference: nabnet_inference_scale; dataset-specific variations via CLI overrides
+  - /model@model: nabnet_inference_scale
+  # Processor aligns evaluator predictions with trainer post-processing pipeline
+  - /processor@processor: waveform_processor_ref_test
+  - _self_
+
+# ============================================================================
+# INPUT PREPROCESSING CONFIGURATION (Blood Pressure Evaluator)
+# ============================================================================
+#
+# NEW FORMAT (Recommended - Lazy Normalization):
+# ----------------------------------------------
+# This evaluator uses lazy normalization for flexible BP estimation.
+#
+input_preprocessing:
+  _convert_: all
+  source:
+    vital: "ppg"              # Source vital sign (typically PPG for BP estimation)
+    norm: "minmax_zc" # Min-max + zero-center normalization
+  target:
+    vital: "abp"              # Target vital sign (ABP waveform for BP extraction)
+    norm: "global_minmax" # Global normalization using dataset BP constants
+  include:
+    - bp_raw
+
+# Benefits of NEW format:
+# - Uses dataset normalization parameters (sbp_max, dbp_min) automatically
+# - Enables WCL support (raw BP data available when use_wcl=True)
+# - Memory efficient (~75% reduction vs pre-normalized)
+# - Flexible (change normalization without reprocessing)
+#
+# BP-Specific Notes:
+# - Use "global_minmax" for ABP/BP to ensure consistent scaling
+# - Dataset normalization params (sbp_max, dbp_min) are passed automatically
+# - For PulseDB: sbp_max=286.58, dbp_min=2.34
+# - For UCI: sbp_max=189.98, dbp_min=50.0
+#
+# Alternative configurations:
+#
+# ECG → ABP (blood pressure from ECG):
+# input_preprocessing:
+#   source: {vital: "ecg", norm: "minmax_zc"}
+#   target: {vital: "abp", norm: "global_minmax"}
+#
+# Direct BP prediction (if model outputs BP scalars):
+# input_preprocessing:
+#   source: {vital: "ppg", norm: "minmax_zc"}
+#   target: {vital: "bp", norm: "global_minmax"}
+#
+# OLD FORMAT (Backward Compatible - for reference):
+# -------------------------------------------------
+# If you need to use pre-normalized data (e.g., for old checkpoints):
+#
+# input_preprocessing:
+#   waveform: "waveform_minmax_zc"  # Pre-normalized source waveform
+#   bp_raw: "bp_raw"                # Raw BP values (SBP, DBP, MAP)
+#   abp: "abp_global_minmax"        # Pre-normalized ABP waveform
+#
+# Note: OLD format requires datasets preprocessed with pre-normalized versions.
+# NEW format works with both old and new dataset formats (auto-detects).
+#
+# For more details, see src/conf/config.yaml (input_preprocessing format documentation).
+# ============================================================================
+
+# Training-aligned checkpoint path/filename templates (single braces for Python .format())
+# Override via CLI: base_dir, trainer_name, model_name, direction (no path_format needed)
+# Example constructed path: WaveRecRef/UCI/WaveRecRef_ppg2abp_cascade_uci_vanilla_BS_256_.../ppg2abpcheckpoint_S_103.pt
+checkpoint_managers:
+  model:
+    _target_: src.utils.checkpoint_manager.CheckpointManager
+    base_dir: weights/pretrained/
+    path_format: '{trainer_name}/{dataset_name}/{trainer_name}_{model_name}_BS_{batch_size}_E_{num_epochs}_LR_{learning_rate}{optional_params}_P_{scheduler_patience}_ES_{early_stopping_patience}{extra_flags}'
+    filename_format: '{direction}checkpoint_S_{seed}{epoch_suffix}{file_ext}'
+
+checkpoint_mapping:
+  model:
+    manager: model
+    checkpoint_key: model_state_dict
+    target_key: model
+
+# P2E-WGAN generator-only inference: use evaluator=blood_pressure_p2ewgan_evaluator, or override:
+#   model@evaluator.model=p2ewgan_generator_inference \
+#   evaluator.checkpoint_mapping.model.checkpoint_key=generator_state_dict
+
+# Example non-checkpoint configurations:
+#   GT-only (model disabled):
+#     python -m src.test evaluator=blood_pressure_evaluator \
+#       model@evaluator.model=null evaluator.load_model_weights=false
+#     # Omit checkpoint_managers, checkpoint_io, trainer_name, dataset_name, checkpoint_epoch.
+#
+#   Checkpoint skip (random init):
+#     python -m src.test evaluator=blood_pressure_evaluator evaluator.load_model_weights=false
+#     # Model stays configured but runs with randomly initialized weights; checkpoints are ignored.
+
+# Usage Examples
+# ============================================================================
+# 1. Command line usage:
+#    python -m src.test evaluator=blood_pressure_evaluator \
+#      test_dataset=test_uci \
+#      test_dataset.dataset_path=/path/to/dataset
+#
+# 2. Override checkpoint path:
+#    python -m src.test evaluator=blood_pressure_evaluator \
+#      evaluator.checkpoint_managers.model.base_dir=/path/to/checkpoints \
+#      evaluator.checkpoint_managers.model.trainer_name=WaveRecRef
+#
+# 3. Override model or processor:
+#    python -m src.test evaluator=blood_pressure_evaluator \
+#      evaluator.model=mdvisco_inference_scale \
+#      evaluator.processor=waveform_processor_test
+#
+# 4. Override direction:
+#    python -m src.test evaluator=blood_pressure_evaluator \
+#      evaluator.directions=ecg2abp
+# ============================================================================

@@ -1,0 +1,63 @@
+# ============================================================================
+# Base Approximation Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Base configuration for approximation (first-stage) training workflows.
+#   Trains models to generate initial waveform approximations from source signals
+#   using deep supervision loss for multi-scale learning.
+#
+# Inherits:
+#   - base_waveform_reconstruction_trainer: Base waveform reconstruction trainer
+#   - criterion: deep_supervision_loss (multi-scale loss for approximation)
+#   - optimizer: adam (Adam optimizer)
+#   - scheduler: reduce_lr_on_plateau (learning rate reduction on plateau)
+#   - checkpoint_manager: Checkpoint saving configuration
+#   - checkpoint_io: Checkpoint I/O configuration
+#   - progress_bar: Progress bar and logging configuration
+#   - early_stopping: Early stopping configuration
+#   - processor: waveform_processor (waveform output processing)
+#   - directions: ppg2abp (default direction, can be overridden)
+#
+# Notes:
+#   - Used as base for model-specific approximation trainers (MD-ViSCo, NABNet, PatchTST, etc.)
+#   - Trainer name: WaveRecApp (Waveform Reconstruction Approximation)
+#   - Deep supervision loss enables multi-scale learning for better approximations
+#
+# ============================================================================
+
+defaults:
+  - base_waveform_reconstruction_trainer
+  - /criterion@criterion: deep_supervision_loss
+  - /optimizer@optimizer: adam
+  - /scheduler@scheduler: reduce_lr_on_plateau
+  - /checkpoint_manager@checkpoint_managers.save: checkpoint_manager
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - /progress_bar@progress_bar: progress_bar
+  - /early_stopping@early_stopping: early_stopping
+  - /processor@processor: waveform_processor
+  - /directions@directions: ppg2abp
+  - _self_
+
+trainer_name: WaveRecApp
+
+# Usage Examples
+# ============================================================================
+# 1. Use as base for model-specific trainers:
+#    defaults:
+#      - base_approximation_trainer
+#      - /model@model: mdvisco_approximation
+#
+# 2. Override direction:
+#    python -m src.train trainer=approximation_trainer_mdvisco \
+#      directions=ecg2abp
+#
+# 3. Override loss or optimizer:
+#    python -m src.train trainer=approximation_trainer_mdvisco \
+#      criterion=mse_loss \
+#      optimizer=sgd
+#
+# 4. Override checkpoint settings:
+#    python -m src.train trainer=approximation_trainer_mdvisco \
+#      checkpoint_managers.save.base_dir=/custom/path
+# ============================================================================

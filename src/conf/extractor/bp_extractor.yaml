@@ -1,0 +1,41 @@
+# ============================================================================
+# BP Extractor Configuration
+# ============================================================================
+#
+# Purpose:
+#   Extracts systolic (SBP) and diastolic (DBP) blood pressure values from ABP
+#   waveforms. SBP (systolic) is maximum arterial pressure during ventricular
+#   contraction; DBP (diastolic) is minimum during relaxation.
+#
+# Inherits:
+#   - base_bp_extractor: Base BP extractor configuration
+#     (from src/processors/extractors.py)
+#
+# Notes:
+#   - Clinical context: Both values in mmHg; normal ranges SBP < 120 mmHg,
+#     DBP < 80 mmHg
+#   - Extends MinMaxExtractor with min_name=dbp, max_name=sbp for ABP
+#   - Used by waveform_processor_ref and other processors requiring BP extraction
+#
+# ============================================================================
+
+defaults:
+  - base_bp_extractor
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in processor configs via Hydra defaults:
+#    defaults:
+#      - /extractor@extractor: bp_extractor
+#    (e.g., waveform_processor_ref)
+#
+# 2. Override key names via CLI:
+#    python src/train.py processor=waveform_processor_ref \
+#      processor.extractor.min_name=diastolic
+#    python src/train.py processor=waveform_processor_ref \
+#      processor.extractor.max_name=systolic
+#
+# 3. Reference:
+#    Parameters and output schema: see src.processors.extractors.BPExtractor
+# ============================================================================

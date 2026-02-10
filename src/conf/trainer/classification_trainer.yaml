@@ -1,0 +1,64 @@
+# ============================================================================
+# Classification Trainer Configuration
+# ============================================================================
+#
+# Purpose:
+#   Trainer configuration for classification tasks (e.g., atrial fibrillation
+#   detection). Trains classification models to predict class labels from
+#   input signals using classification loss.
+#
+# Inherits:
+#   - base_classification_trainer: Base classification trainer configuration
+#   - model: af_classifier_cascade (AF classifier cascade model)
+#   - criterion: af_classification_loss (classification loss)
+#   - optimizer: adam (Adam optimizer)
+#   - scheduler: reduce_lr_on_plateau (learning rate reduction on plateau)
+#   - checkpoint_manager: Checkpoint loading and saving configuration
+#   - checkpoint_io: Checkpoint I/O configuration
+#   - progress_bar: Progress bar and logging configuration
+#   - early_stopping: Early stopping configuration
+#   - processor: classification_processor (classification output processing)
+#   - directions: ppg2ecg (default direction, can be overridden)
+#
+# Notes:
+#   - Supports both checkpoint loading and saving
+#   - Uses classification processor for logits/probabilities/class predictions
+#   - Supports binary and multi-class classification tasks
+#
+# ============================================================================
+
+defaults:
+  - base_classification_trainer
+  - /model@model: af_classifier_cascade
+  - /criterion@criterion: af_classification_loss
+  - /optimizer@optimizer: adam
+  - /scheduler@scheduler: reduce_lr_on_plateau
+  - /checkpoint_manager@checkpoint_managers.load: checkpoint_manager
+  - /checkpoint_manager@checkpoint_managers.save: checkpoint_manager
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - /progress_bar@progress_bar: progress_bar
+  - /early_stopping@early_stopping: early_stopping
+  - /processor@processor: classification_processor
+  - /directions@directions: ppg2ecg
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Basic training:
+#    python -m src.train trainer=classification_trainer \
+#      train_dataset=train_mimic_perform_af_1024
+#
+# 2. Override direction:
+#    python -m src.train trainer=classification_trainer \
+#      directions=ecg2ppg
+#
+# 3. Override model or processor:
+#    python -m src.train trainer=classification_trainer \
+#      model=af_classifier \
+#      processor.threshold=0.3
+#
+# 4. Override checkpoint paths:
+#    python -m src.train trainer=classification_trainer \
+#      checkpoint_managers.load.base_dir=/path/to/pretrained \
+#      checkpoint_managers.save.base_dir=/path/to/output
+# ============================================================================

@@ -1,0 +1,57 @@
+# ============================================================================
+# MD-ViSCo Refinement Model (BPModel) – Unified Configuration
+# ============================================================================
+# Paper: MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion (arXiv:2506.08357, §6.2.2)
+# Validation: Validated 2026-01-31
+# Datasets: UCI (1024, no PI) | PulseDB (1280, requires PI override)
+#
+# Params set here (source):
+#   wcl_age_threshold=0.0235, wcl=true, normalized_bp=true (model config)
+#   input_length → dataset via Hydra
+#   vital_encoders.{ppg,ecg}: d_model=64, num_layers=15, expansion_factor=5, patch_length=4, projection_dim=512, dropout=0.1, pi=false (paper §6.2.2)
+#   text_encoder_pipeline=null (UCI default)
+#
+# Notes:
+#   - UCI: pi=false (no patient info); PulseDB: override with pi=true and text_encoder_pipeline
+#   - PatchTSMixer for waveform encoding, DistilBERT for patient demographics (PI mode)
+#
+# Usage:
+#   torchrun --module src.train -m model=mdvisco_refinement trainer=refinement_trainer_mdvisco train_dataset=train_uci_refinement_abp test_dataset=test_uci_refinement_abp
+# ============================================================================
+
+defaults:
+  - base_bp_model
+  - /checkpoint_io@checkpoint_io: checkpoint_io
+  - _self_
+
+input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}
+text_encoder_pipeline: null
+
+vital_encoders:
+  ppg:
+    _target_: src.model.mdvisco.VitalEncoder
+    vital: ppg
+    input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}
+    projection_dim: 512
+    dropout: 0.1
+    d_model: 64
+    pi: false
+    num_input_channels: 1
+    num_layers: 15
+    expansion_factor: 5
+    patch_length: 4
+    patch_stride: 4
+
+  ecg:
+    _target_: src.model.mdvisco.VitalEncoder
+    vital: ecg
+    input_length: ${oc.select:train_dataset.input_size,${test_dataset.input_size}}
+    projection_dim: 512
+    dropout: 0.1
+    d_model: 64
+    pi: false
+    num_input_channels: 1
+    num_layers: 15
+    expansion_factor: 5
+    patch_length: 4
+    patch_stride: 4

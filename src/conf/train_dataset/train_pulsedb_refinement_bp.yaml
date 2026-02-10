@@ -1,0 +1,69 @@
+# ============================================================================
+# PulseDB Training Dataset Configuration for Scalar BP Regression
+# ============================================================================
+#
+# Purpose:
+#   Training dataset configuration for PulseDB scalar BP regression (target: BP only).
+#   Inherits base PulseDB settings and defines training-specific preprocessing and
+#   data loading parameters for scalar regression trainers.
+#
+# Inherits:
+#   - base_pulsedb: Base PulseDB dataset configuration
+#
+# Notes:
+#   - BP normalization: dbp_min and sbp_max define the dataset's BP value ranges used for
+#     denormalization during inference. These values are automatically sourced from the base
+#     dataset config (base_pulsedb) and used by processors to convert normalized predictions back
+#     to mmHg. PulseDB: DBP range 2.34 mmHg, SBP range up to 286.58 mmHg
+#   - Target: BP scalar only (for scalar regression trainers like PatchTST, NABNet)
+#   - Default split: 81% train, 9% validation, 10% test
+#
+# ============================================================================
+
+defaults:
+  - base_pulsedb
+  - _self_
+
+# Target: BP scalar only (for scalar regression trainers like PatchTST, NABNet)
+input_preprocessing:
+  source:
+    - vital: "ecg"
+      norm: "minmax_zc"
+    - vital: "ppg"
+      norm: "minmax_zc"
+    - vital: "abp"
+      norm: "minmax_zc"
+  target:
+    - vital: "bp"
+      norm: "global_minmax"
+  include:
+    - bp_raw
+    - age_raw
+    - gender_raw
+    - height_raw
+    - weight_raw
+    - bmi_raw
+
+dataset_path: ???
+file_name: "CalFree_Test_Subset.h5"
+train_ratio: 0.81
+val_ratio: 0.09
+test_ratio: 0.1
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - train_dataset: train_pulsedb_refinement_bp
+#
+# 2. Command line override:
+#    python src/train.py trainer=approximation_trainer_nabnet \
+#      train_dataset=train_pulsedb_refinement_bp \
+#      train_dataset.dataset_path=/path/to/pulsedb/data
+#
+# 3. Override preprocessing or split ratios:
+#    python src/train.py train_dataset=train_pulsedb_refinement_bp \
+#      train_dataset.train_ratio=0.75 \
+#      train_dataset.val_ratio=0.25
+# ============================================================================
+

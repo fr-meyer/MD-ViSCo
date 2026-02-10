@@ -1,0 +1,35 @@
+# ============================================================================
+# AF Classification Loss Configuration
+# ============================================================================
+#
+# Purpose:
+#   Entry point configuration for AF (Atrial Fibrillation) classification loss.
+#   Composes base_af_classification_loss from the Hydra ConfigStore to provide
+#   classification loss parameters for AF detection model training.
+#
+# Inherits:
+#   - base_af_classification_loss: Base AF classification loss configuration from ConfigStore
+#
+# Notes:
+#   - Used for binary classification tasks to detect atrial fibrillation
+#   - Typically used with classification trainers and AF classifier models
+#
+# ============================================================================
+
+defaults:
+  - base_af_classification_loss
+  - _self_
+
+# Usage Examples
+# ============================================================================
+# 1. Reference in trainer configs via Hydra defaults:
+#    defaults:
+#      - /criterion@criterion: af_classification_loss
+#
+# 2. Command line override:
+#    python src/train.py trainer=classification_trainer \
+#      criterion=af_classification_loss
+#
+# 3. Override loss weight if needed:
+#    python src/train.py criterion=af_classification_loss criterion.weight=1.0
+# ============================================================================
