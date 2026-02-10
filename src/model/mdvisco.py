@@ -226,7 +226,8 @@ class UNetSwinUnet(SingleStageModel):
         depth (int): Depth of the UNet architecture. Default: 1
 
     Paper Reference:
-        MD-ViSCo paper (arXiv:2506.08357), Section 6.2.1, page 22
+        MD-ViSCo paper: IEEE J. Biomed. Health Inform. (2026,
+        DOI: 10.1109/JBHI.2025.3639315), Section 6.2.1, page 22
         - Filter channels: 64, kernel size: 3, window size: 4
         - Single-level U-Net with upsample scale [4]
     """

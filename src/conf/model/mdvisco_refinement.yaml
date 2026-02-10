@@ -1,7 +1,7 @@
 # ============================================================================
 # MD-ViSCo Refinement Model (BPModel) – Unified Configuration
 # ============================================================================
-# Paper: MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion (arXiv:2506.08357, §6.2.2)
+# Paper: MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion (IEEE J. Biomed. Health Inform. (2026, DOI: 10.1109/JBHI.2025.3639315), §6.2.2)
 # Validation: Validated 2026-01-31
 # Datasets: UCI (1024, no PI) | PulseDB (1280, requires PI override)
 #

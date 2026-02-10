@@ -1,7 +1,7 @@
 # ============================================================================
 # MD-ViSCo Approximation Model – Unified Configuration
 # ============================================================================
-# Paper: MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion (arXiv:2506.08357, §6.2.1)
+# Paper: MD-ViSCo: A Unified Model for Multi-Directional Vital Sign Waveform Conversion (IEEE J. Biomed. Health Inform. (2026, DOI: 10.1109/JBHI.2025.3639315), §6.2.1)
 # Validation: Validated 2026-01-29
 # Datasets: UCI (1024) | PulseDB (1280) | MIMIC-Perform-Large (4000)
 #
